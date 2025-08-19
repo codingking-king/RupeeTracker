@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}RupeeTrack{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            50: '#f9fafb',
+                            100: '#f3f4f6',
+                            200: '#e5e7eb',
+                            300: '#d1d5db',
+                            400: '#9ca3af',
+                            500: '#6b7280',
+                            600: '#4b5563',
+                            700: '#374151',
+                            800: '#1f2937',
+                            900: '#111827',
+                            950: '#030712'
+                        },
+                        primary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6', /* Main purple */
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                            950: '#2e1065'
+                        },
+                        accent: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            200: '#a7f3d0',
+                            300: '#6ee7b7',
+                            400: '#34d399',
+                            500: '#10b981', /* Main green */
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                            950: '#022c22'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/loading_screen.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom_dashboard.css') }}">
+    <style>
+        :root {
+            --bg-dark: #030712; /* dark-950 */
+            --text-dark: #f3f4f6; /* dark-100 */
+            --surface-dark: #1f2937; /* dark-800 */
+            --border-dark: #374151; /* dark-700 */
+            --input-bg-dark: #374151; /* dark-700 */
+            --input-border-dark: #4b5563; /* dark-600 */
+            --shadow-color-dark: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Base styles for both themes */
+        * {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border: none !important;
+            outline: none !important;
+            overflow-x: hidden; /* Hide horizontal scrollbar */
+        }
+        
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Form elements styling */
+        input, select, textarea {
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--primary-500-alpha); /* Use a variable for focus ring */
+        }
+        
+        /* Button styling */
+        button {
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        /* Table styling */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+        
+        /* Card styling */
+        .card {
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color-sm);
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--surface-dark);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-dark);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--dark-600);
+        }
+
+        /* Base styles for both themes */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+            min-height: 100vh; /* Ensure body covers full viewport height */
+            background: linear-gradient(135deg, var(--primary-950), var(--primary-900), var(--primary-800));
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            border: none !important;
+            outline: none !important;
+            overflow-x: hidden; /* Hide horizontal scrollbar */
+        }
+
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Form elements styling */
+        input, select, textarea {
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s ease-in-out;
+            background-color: var(--input-bg-dark) !important;
+            color: var(--text-dark) !important;
+            border-color: var(--input-border-dark) !important;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.4) !important; /* Primary-500 with alpha */
+        }
+        
+        /* Button styling */
+        button {
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        /* Table styling */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background-color: var(--surface-dark) !important;
+            color: var(--text-dark) !important;
+        }
+        
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+        
+        thead {
+            background-color: var(--dark-700) !important;
+        }
+        tbody {
+            background-color: var(--surface-dark) !important;
+        }
+        tr:hover {
+            background-color: var(--dark-700) !important;
+        }
+
+        /* Card styling */
+        .card {
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px var(--shadow-color-dark), 0 2px 4px -1px var(--shadow-color-dark);
+            transition: all 0.3s ease-in-out;
+            background-color: var(--surface-dark) !important;
+            border-color: var(--border-dark) !important;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--surface-dark);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-dark);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--dark-600);
+        }
+
+        /* Specific component styles */
+        .sidebar {
+            background-color: var(--dark-950);
+            border-right-color: var(--dark-800);
+        }
+        footer {
+            border-top-color: var(--dark-800);
+        }
+
+        .sidebar-link.active {
+            @apply bg-primary-700 text-white shadow-md;
+        }
+        .sidebar-link.active:hover {
+            @apply bg-primary-600;
+        }
+
+        /* Specific component styles */
+        .sidebar-link.active {
+            @apply bg-primary-700 text-white shadow-md;
+        }
+        .sidebar-link.active:hover {
+            @apply bg-primary-600;
+        }
+
+        /* Fix for browser autocomplete suggestions text color - GLOBAL */
+        /* Fix for browser autocomplete suggestions text color - GLOBAL */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px var(--input-bg-dark) inset !important;
+            -webkit-text-fill-color: var(--text-dark) !important;
+            color: var(--text-dark) !important;
+            background-color: var(--input-bg-dark) !important;
+        }
+
+        /* Fix for Firefox autocomplete */
+        input:-moz-autofill {
+            background-color: var(--input-bg-dark) !important;
+            color: var(--text-dark) !important;
+        }
+
+        /* Ensure all text input fields have correct text color */
+        input[type="text"], input[type="email"], input[type="password"], textarea {
+            color: var(--text-dark) !important;
+        }
+
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, textarea:focus {
+            color: var(--text-dark) !important;
+        }
+
+        /* Hide autocomplete dropdown buttons */
+        input[type="text"]::-webkit-contacts-auto-fill-button,
+        input[type="text"]::-webkit-credentials-auto-fill-button {
+            visibility: hidden;
+            display: none !important;
+            pointer-events: none;
+            height: 0;
+            width: 0;
+            margin: 0;
+        }
+
+        /* Enhanced notification styles - COMPACT */
+        .notification-alert {
+            animation: slideInFromTop 0.5s ease-out;
+            width: fit-content !important;
+            max-width: 600px !important;
+            margin: 0 auto 0.75rem auto !important;
+        }
+
+        @keyframes slideInFromTop {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .notification-exit {
+            animation: slideOutToTop 0.3s ease-in forwards;
+        }
+
+        @keyframes slideOutToTop {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+                max-height: 200px;
+                margin-bottom: 0.75rem;
+            }
+            to {
+                transform: translateY(-100%);
+                opacity: 0;
+                max-height: 0;
+                margin-bottom: 0;
+            }
+        }
+
+        /* Notification container for centering */
+        .notification-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Responsive sidebar toggle */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -256px; /* Hidden by default */
+                height: 100%;
+                z-index: 50;
+                transition: left 0.3s ease-in-out;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            .content-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 40;
+            }
+            .content-overlay.active {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay - Always present from the start -->
+    <div id="loading-overlay" class="fixed inset-0 bg-dark-950 flex flex-col items-center justify-center z-50 transition-opacity duration-500 ease-out">
+        <h1 class="program-name text-4xl font-extrabold text-white mb-6">RupeeTrack</h1>
+        <div class="bouncing-dots flex space-x-2">
+            <div class="dot w-4 h-4 bg-primary-500 rounded-full animate-bounce" style="animation-delay: -0.32s;"></div>
+            <div class="dot w-4 h-4 bg-accent-500 rounded-full animate-bounce" style="animation-delay: -0.16s;"></div>
+            <div class="dot w-4 h-4 bg-blue-500 rounded-full animate-bounce"></div>
+        </div>
+    </div>
+
+    <div class="flex h-screen">
+        {% block hide_sidebar %}
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar w-64 flex-shrink-0 bg-dark-950 text-text-dark border-r border-dark-800 p-6 overflow-y-auto md:sticky md:top-0 flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-8">
+                    <a id="rupeetrack-logo" class="text-text-dark text-2xl font-extrabold tracking-wide" href="{{ url_for('index') }}">RupeeTrack</a>
+                </div>
+                <nav class="space-y-3">
+                    <ul>
+                        <li>
+                            <a href="{{ url_for('index') }}" class="sidebar-link flex items-center py-3 px-4 rounded-lg text-lg font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition duration-200 ease-in-out {% if request.endpoint == 'index' %}active{% endif %}">
+                                <i class="fas fa-home mr-3"></i>Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('transactions_page') }}" class="sidebar-link flex items-center py-3 px-4 rounded-lg text-lg font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition duration-200 ease-in-out {% if request.endpoint == 'transactions_page' %}active{% endif %}">
+                                <i class="fas fa-exchange-alt mr-3"></i>Transactions
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('budgets_page') }}" class="sidebar-link flex items-center py-3 px-4 rounded-lg text-lg font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition duration-200 ease-in-out {% if request.endpoint == 'budgets_page' %}active{% endif %}">
+                                <i class="fas fa-money-check-alt mr-3"></i>Budgets
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('goals') }}" class="sidebar-link flex items-center py-3 px-4 rounded-lg text-lg font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition duration-200 ease-in-out {% if request.endpoint == 'goals' %}active{% endif %}">
+                                <i class="fas fa-bullseye mr-3"></i>Savings Goals
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <nav class="space-y-3">
+                <ul>
+                    <li class="mb-2">
+                        <a href="{{ url_for('profile_page') }}" class="sidebar-link flex items-center py-3 px-4 rounded-lg text-lg font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition duration-200 ease-in-out {% if request.endpoint == 'profile_page' %}active{% endif %}">
+                            <i class="fas fa-user-circle mr-3"></i>Profile
+                        </a>
+                    </li>
+                    <li>
+                        <div class="text-center text-gray-600 text-sm mt-2">
+                            <p>&copy; 2025 RupeeTrack.</p>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        {% endblock %}
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Page Content -->
+            <main class="flex-1 overflow-y-auto p-8 pt-4" style="background-color: var(--surface-dark) !important; min-height: 100vh;">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="notification-container">
+                            <div class="flex flex-col items-center space-y-3">
+                                {% for category, message in messages %}
+                                    <div id="notification-{{ loop.index }}" class="notification-alert p-3 text-base rounded-lg shadow-lg border-l-4 {% if category == 'error' %}bg-red-900/90 text-red-100 border-red-500{% else %}bg-green-900/90 text-green-100 border-green-500{% endif %} backdrop-blur-sm transition-all duration-300 ease-in-out transform" role="alert">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0">
+                                                {% if category == 'error' %}
+                                                    <i class="fas fa-exclamation-triangle text-red-400 text-lg mr-2"></i>
+                                                {% else %}
+                                                    <i class="fas fa-check-circle text-green-400 text-lg mr-2"></i>
+                                                {% endif %}
+                                            </div>
+                                            <div class="mr-3">
+                                                <p class="font-medium">{{ message }}</p>
+                                            </div>
+                                            <div class="flex-shrink-0">
+                                                <button onclick="closeNotification('notification-{{ loop.index }}')" class="inline-flex text-gray-300 hover:text-white focus:outline-none focus:text-white transition-colors duration-200 hover:bg-gray-700 rounded-full p-1">
+                                                    <i class="fas fa-times text-sm"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endwith %}
+        
+                {% block content %}{% endblock %}
+            </main>
+
+        </div>
+    </div>
+
+    <div id="content-overlay" class="content-overlay md:hidden" onclick="toggleSidebar()"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Enhanced notification close function
+        function closeNotification(notificationId) {
+            const notification = document.getElementById(notificationId);
+            if (notification) {
+                notification.classList.add('notification-exit');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }
+        }
+
+        // Auto-hide notifications after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const notifications = document.querySelectorAll('.notification-alert');
+            notifications.forEach(function(notification, index) {
+                setTimeout(() => {
+                    if (notification && notification.parentNode) {
+                        closeNotification(notification.id);
+                    }
+                }, 5000 + (index * 500)); // Stagger auto-hide for multiple notifications
+            });
+        });
+
+        // Sidebar toggle for mobile
+        const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
+        const sidebar = document.getElementById('sidebar');
+        const contentOverlay = document.getElementById('content-overlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            contentOverlay.classList.toggle('active');
+        }
+
+        if (sidebarToggleBtn) {
+            sidebarToggleBtn.addEventListener('click', toggleSidebar);
+        } else {
+            console.warn("Sidebar toggle button not found. Mobile sidebar toggle may not function.");
+        }
+        if (contentOverlay) {
+            contentOverlay.addEventListener('click', toggleSidebar);
+        } else {
+            console.warn("Content overlay not found. Mobile sidebar toggle may not function.");
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+    <script src="{{ url_for('static', filename='js/loading_screen.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const rupeetrackLogo = document.getElementById('rupeetrack-logo');
+            if (rupeetrackLogo) {
+                rupeetrackLogo.addEventListener('click', function(event) {
+                    event.preventDefault(); // Prevent default link behavior
+                    window.showLoadingScreen(); // Call the global function from loading_screen.js
+                    // Redirect after a short delay to allow loading screen to show
+                    setTimeout(() => {
+                        window.location.href = rupeetrackLogo.href;
+                    }, 500); // Adjust delay as needed
+                });
+            }
+        });
+    </script>
+</body>
+</html>

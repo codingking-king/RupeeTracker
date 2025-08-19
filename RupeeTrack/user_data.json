@@ -1,0 +1,216 @@
+{
+    "name": "Demo User",
+    "email": "demo@rupeetrack.com",
+    "transactions": [
+        {
+            "id": "f2a89d55-ba45-4618-b658-0b54c31a6c76",
+            "description": "Income",
+            "amount": 10000.0,
+            "type": "income",
+            "category": "Salary",
+            "timestamp": "2025-08-13 22:22:27"
+        },
+        {
+            "id": "562f33dc-f7a9-4ef5-83eb-a79a1f025fcb",
+            "description": "Income",
+            "amount": 10000.0,
+            "type": "income",
+            "category": "Salary",
+            "timestamp": "2025-08-15 22:23:00"
+        },
+        {
+            "id": "9364a228-32a5-48a4-8d77-47779164c674",
+            "description": "Freelance",
+            "amount": 5000.0,
+            "type": "income",
+            "category": "Salary",
+            "timestamp": "2025-08-10 22:42:16"
+        },
+        {
+            "id": "c109616d-de95-40ec-a29f-7f271ad8e65f",
+            "description": "Monthly Salary",
+            "amount": 25000.0,
+            "type": "income",
+            "category": "Salary",
+            "timestamp": "2025-08-12 22:50:06"
+        },
+        {
+            "id": "2453b1de-7c43-4da3-9366-bae6af1c9e3f",
+            "description": "Groceries",
+            "amount": 1500.0,
+            "type": "expense",
+            "category": "Food",
+            "timestamp": "2025-08-13 22:52:58"
+        },
+        {
+            "id": "3f3acf06-f5e3-458b-b408-8a61399c5591",
+            "description": "Internet",
+            "amount": 1200.0,
+            "type": "expense",
+            "category": "Bills",
+            "timestamp": "2025-08-13 22:53:14"
+        },
+        {
+            "id": "ab4d2b01-7447-4752-ae76-d66728456e7e",
+            "description": "Maintenance",
+            "amount": 3000.0,
+            "type": "expense",
+            "category": "Housing",
+            "timestamp": "2025-08-01 22:53:31"
+        },
+        {
+            "id": "94b6c6c5-abca-4806-9b26-b191f20a62e1",
+            "description": "Chai Biscuit",
+            "amount": 20.0,
+            "type": "expense",
+            "category": "Food",
+            "timestamp": "2025-08-13 23:07:16"
+        },
+        {
+            "id": "7476b51f-eb90-473b-a745-53911b8b8e71",
+            "description": "Dinner",
+            "amount": 800.0,
+            "type": "expense",
+            "category": "Food",
+            "timestamp": "2025-08-13 23:25:44"
+        },
+        {
+            "id": "918df55d-092f-47aa-b9e4-95e2404f835b",
+            "description": "Water",
+            "amount": 1500.0,
+            "type": "expense",
+            "category": "Bills",
+            "timestamp": "2025-08-13 23:25:54"
+        },
+        {
+            "id": "c8f160e3-6b8c-4b54-8111-d2f4a55d6f14",
+            "description": "Rent",
+            "amount": 15000.0,
+            "type": "expense",
+            "category": "Housing",
+            "timestamp": "2025-08-13 23:26:00"
+        },
+        {
+            "id": "14084c6e-0e05-48b6-bb30-4966c8827922",
+            "description": "Part-time",
+            "amount": 1500.0,
+            "type": "income",
+            "category": "Salary",
+            "timestamp": "2025-08-13 23:26:05"
+        },
+        {
+            "id": "58f1567c-d62d-47b7-8d3f-136cfd8b7b08",
+            "description": "Lunch",
+            "amount": 500.0,
+            "type": "expense",
+            "category": "Food",
+            "timestamp": "2025-08-13 23:28:34"
+        },
+        {
+            "id": "1f5250e2-23b0-45b5-8161-f55875ed275b",
+            "description": "Monthly Salary",
+            "amount": 25000.0,
+            "type": "income",
+            "category": "Salary",
+            "timestamp": "2025-08-13 23:47:30"
+        },
+        {
+            "id": "e649a6cd-d6e0-497d-9e72-d0e1f90c21b5",
+            "description": "Lunch",
+            "amount": 500.0,
+            "type": "expense",
+            "category": "Food",
+            "timestamp": "2025-08-13 23:47:40"
+        },
+        {
+            "id": "0bd8e4a0-3ad2-4d76-9d76-ae1101c49f56",
+            "description": "Monthly Salary",
+            "amount": 25000.0,
+            "type": "income",
+            "category": "Salary",
+            "timestamp": "2025-08-14 23:10:49"
+        },
+        {
+            "id": "6c19ade9-dc67-45c5-aeab-65a07ac31fa6",
+            "description": "Monthly Salary",
+            "amount": 25000.0,
+            "type": "income",
+            "category": "Salary",
+            "timestamp": "2025-08-14 23:13:17"
+        },
+        {
+            "id": "a094f050-1e00-4881-b9fa-073e657b3a14",
+            "description": "Gaming",
+            "amount": 1000.0,
+            "type": "expense",
+            "category": "Entertainment",
+            "timestamp": "2025-08-14 23:16:18"
+        },
+        {
+            "id": "6e5164b3-d539-4b49-bfcc-d1cd70918d76",
+            "description": "Bonus",
+            "amount": 3000.0,
+            "type": "income",
+            "category": "Salary",
+            "timestamp": "2025-08-15 23:16:10"
+        },
+        {
+            "id": "9103cf2b-6caf-44ca-a1fe-4fe9a67e9e9b",
+            "description": "Part-time",
+            "amount": 1500.0,
+            "type": "income",
+            "category": "Salary",
+            "timestamp": "2025-08-15 23:16:27"
+        },
+        {
+            "id": "4f4d0ffd-0c80-4968-9632-9fa41f98ff0e",
+            "description": "Bonus",
+            "amount": 3000.0,
+            "type": "income",
+            "category": "Salary",
+            "timestamp": "2025-08-15 23:24:35"
+        }
+    ],
+    "budget": {
+        "monthly": 25000.0,
+        "categories": {
+            "Entertainment": 5000.0,
+            "Food": 4000.0
+        },
+        "history": [
+            {
+                "date": "2025-08-14T23:24:35.374301",
+                "previous_amount": 25000.0,
+                "new_amount": 25000.0,
+                "change_reason": "Manual update"
+            },
+            {
+                "date": "2025-08-15T22:12:08.990398",
+                "previous_amount": 25000.0,
+                "new_amount": 25000.0,
+                "change_reason": "Manual update"
+            }
+        ],
+        "last_updated": "2025-08-15T22:12:08.990398",
+        "change_history": [
+            {
+                "date": "2025-08-14T23:24:35.374301",
+                "previous_amount": 25000.0,
+                "new_amount": 25000.0,
+                "change_reason": "Manual update"
+            },
+            {
+                "date": "2025-08-15T22:12:08.990398",
+                "previous_amount": 25000.0,
+                "new_amount": 25000.0,
+                "change_reason": "Manual update"
+            }
+        ]
+    },
+    "goals": [],
+    "settings": {
+        "show_presets": true,
+        "smart_suggestions": false,
+        "show_confirmations": false
+    }
+}

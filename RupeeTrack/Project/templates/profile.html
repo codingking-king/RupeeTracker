@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - {{ user.name }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6 text-white text-center">User Profile</h1>
+
+    <!-- Profile Info Card -->
+    <div class="bg-gray-800 rounded-lg p-6 shadow-lg mb-6 border border-gray-700">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="w-20 h-20 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-2xl font-bold text-white mr-6 shadow-lg">
+                    {{ user.name[0].upper() if user.name else 'U' }}
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white mb-1">{{ user.name }}</h2>
+                    <p class="text-gray-300 mb-1">{{ user.email }}</p>
+                    <div class="flex items-center text-gray-400 text-sm">
+                        <i class="fas fa-calendar-alt mr-2"></i>
+                        <span>Member since {{ user.join_date or "2024" }}</span>
+                    </div>
+                </div>
+            </div>
+            <button onclick="toggleEditProfile()" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg">
+                <i class="fas fa-edit mr-2"></i>Edit Profile
+            </button>
+        </div>
+    </div>
+
+    <!-- Financial Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-green-100 text-sm font-medium">Total Income</p>
+                    <p class="text-2xl font-bold break-words">₹{{ "{:,.2f}".format(total_income) }}</p>
+                    <p class="text-green-100 text-xs mt-1">{{ income_count }} transactions</p>
+                </div>
+                <div class="bg-green-400 bg-opacity-30 rounded-full p-4">
+                    <i class="fas fa-arrow-up text-2xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-gradient-to-r from-red-500 to-red-600 rounded-lg p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-red-100 text-sm font-medium">Total Expenses</p>
+                    <p class="text-2xl font-bold break-words">₹{{ "{:,.2f}".format(total_expenses) }}</p>
+                    <p class="text-red-100 text-xs mt-1">{{ expense_count }} transactions</p>
+                </div>
+                <div class="bg-red-400 bg-opacity-30 rounded-full p-4">
+                    <i class="fas fa-arrow-down text-2xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-blue-100 text-sm font-medium">Current Balance</p>
+                    <p class="text-2xl font-bold break-words">₹{{ "{:,.2f}".format(balance) }}</p>
+                    <p class="text-blue-100 text-xs mt-1">{{ total_transactions }} total transactions</p>
+                </div>
+                <div class="bg-blue-400 bg-opacity-30 rounded-full p-4">
+                    <i class="fas fa-wallet text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Savings Card -->
+        <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-yellow-100 text-sm font-medium">Total Savings</p>
+                    <p class="text-2xl font-bold break-words">₹{{ "{:,.2f}".format(total_savings) }}</p>
+                    <p class="text-yellow-100 text-xs mt-1">from {{ savings_count }} sources</p>
+                </div>
+                <div class="bg-yellow-400 bg-opacity-30 rounded-full p-4">
+                    <i class="fas fa-piggy-bank text-2xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial Highlights -->
+    <div class="bg-gray-800 rounded-lg p-6 shadow-lg mb-6 border border-gray-700">
+        <h3 class="text-xl font-semibold text-white mb-6 flex items-center">
+            <i class="fas fa-chart-line mr-3 text-purple-400"></i>Financial Highlights
+        </h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {% if largest_expense %}
+            <div class="bg-gradient-to-br from-red-500/20 to-red-600/20 border border-red-500/30 rounded-lg p-4 hover:border-red-400/50 transition-all duration-300">
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-arrow-down text-red-400 mr-2"></i>
+                    <p class="text-red-400 text-sm font-medium">Largest Expense</p>
+                </div>
+                <p class="text-white font-bold text-lg">₹{{ "{:,.2f}".format(largest_expense.amount) }}</p>
+                <p class="text-gray-400 text-xs mt-1">{{ largest_expense.description[:20] }}{% if largest_expense.description|length > 20 %}...{% endif %}</p>
+            </div>
+            {% endif %}
+            
+            {% if largest_income %}
+            <div class="bg-gradient-to-br from-green-500/20 to-green-600/20 border border-green-500/30 rounded-lg p-4 hover:border-green-400/50 transition-all duration-300">
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-arrow-up text-green-400 mr-2"></i>
+                    <p class="text-green-400 text-sm font-medium">Largest Income</p>
+                </div>
+                <p class="text-white font-bold text-lg">₹{{ "{:,.2f}".format(largest_income.amount) }}</p>
+                <p class="text-gray-400 text-xs mt-1">{{ largest_income.description[:20] }}{% if largest_income.description|length > 20 %}...{% endif %}</p>
+            </div>
+            {% endif %}
+            
+            <div class="bg-gradient-to-br from-purple-500/20 to-purple-600/20 border border-purple-500/30 rounded-lg p-4 hover:border-purple-400/50 transition-all duration-300">
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-tags text-purple-400 mr-2"></i>
+                    <p class="text-purple-400 text-sm font-medium">Top Category</p>
+                </div>
+                <p class="text-white font-bold text-lg">{{ top_category[0] }}</p>
+                <p class="text-gray-400 text-xs mt-1">₹{{ "{:,.2f}".format(top_category[1]) }} spent</p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-indigo-500/20 to-indigo-600/20 border border-indigo-500/30 rounded-lg p-4 hover:border-indigo-400/50 transition-all duration-300">
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-calendar-week text-indigo-400 mr-2"></i>
+                    <p class="text-indigo-400 text-sm font-medium">This Month</p>
+                </div>
+                <p class="text-white font-bold text-lg">{{ (income_count + expense_count) }}</p>
+                <p class="text-gray-400 text-xs mt-1">Total transactions</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Actions Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <!-- Security Settings -->
+        <div class="bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-700">
+            <h3 class="text-xl font-semibold text-white mb-4 flex items-center">
+                <i class="fas fa-shield-alt mr-3 text-green-400"></i>Security
+            </h3>
+            <div class="space-y-4">
+                <button onclick="alert('Demo mode - Password change not available')" class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-key mr-2"></i>Change Password
+                </button>
+                <div class="bg-gray-700/50 rounded-lg p-3">
+                    <div class="flex items-center text-sm text-gray-400">
+                        <i class="fas fa-info-circle mr-2 text-blue-400"></i>
+                        <span>Demo mode - No authentication</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Journal -->
+        <div class="bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-700">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold text-white flex items-center">
+                    <i class="fas fa-journal-whills mr-3 text-purple-400"></i>Financial Journal
+                </h3>
+                <span class="bg-purple-600 text-white text-sm px-3 py-1 rounded-full font-medium">{{ user.journal_entries|length }}</span>
+            </div>
+            <p class="text-gray-400 text-sm mb-4">Record your financial thoughts and progress.</p>
+            <button onclick="toggleFinancialNotes()" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg">
+                <i class="fas fa-book-open mr-2"></i>Open Journal
+            </button>
+        </div>
+
+        <!-- App Settings -->
+        <div class="bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-700">
+            <h3 class="text-xl font-semibold text-white mb-4 flex items-center">
+                <i class="fas fa-cog mr-3 text-blue-400"></i>App Settings
+            </h3>
+            <div class="space-y-4">
+                <button onclick="toggleAppSettings()" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-sliders-h mr-2"></i>Customize App
+                </button>
+                <div class="bg-gray-700/50 rounded-lg p-3">
+                    <div class="flex items-center text-sm text-gray-400">
+                        <i class="fas fa-info-circle mr-2 text-blue-400"></i>
+                        <span>Personalize your experience</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-700">
+            <h3 class="text-xl font-semibold text-white mb-4 flex items-center">
+                <i class="fas fa-compass mr-3 text-orange-400"></i>Navigation
+            </h3>
+            <div class="space-y-3">
+                <button onclick="window.location.href='/'" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-home mr-2"></i>Go to Dashboard
+                </button>
+                <button onclick="window.location.href='/transactions'" class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-exchange-alt mr-2"></i>View Transactions
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="flex justify-center mt-8">
+    <button onclick="window.location.href='/logout'" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg text-xl font-semibold">
+        <i class="fas fa-sign-out-alt mr-3"></i>Logout
+    </button>
+</div>
+
+<!-- App Settings Modal -->
+<div id="appSettingsModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-gray-800 rounded-xl p-8 max-w-2xl w-full border border-gray-700 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center">
+                    <i class="fas fa-cog text-blue-400 text-2xl mr-3"></i>
+                    <h3 class="text-2xl font-bold text-white">App Settings</h3>
+                </div>
+                <button onclick="toggleAppSettings()" class="text-gray-400 hover:text-white transition duration-300">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form action="{{ url_for('update_settings') }}" method="POST">
+                <!-- Transaction Features -->
+                <div class="bg-gray-700/30 rounded-xl p-6 mb-6 border border-gray-600/50">
+                    <h4 class="text-lg font-semibold text-white mb-4 flex items-center">
+                        <i class="fas fa-exchange-alt mr-3 text-green-400"></i>Transaction Features
+                    </h4>
+                    
+                    <!-- Quick Presets Toggle -->
+                    <div class="flex items-center justify-between p-4 bg-gray-700/50 rounded-lg mb-4 border border-gray-600/30">
+                        <div class="flex items-center">
+                            <i class="fas fa-bolt text-yellow-400 text-xl mr-3"></i>
+                            <div>
+                                <h5 class="text-white font-medium">Quick Presets</h5>
+                                <p class="text-gray-400 text-sm">Show preset buttons for common transactions</p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="show_presets" value="1" 
+                                   {% if user.settings and user.settings.show_presets %}checked{% endif %}
+                                   class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                    
+                    <!-- Smart Suggestions Toggle -->
+                    <div class="flex items-center justify-between p-4 bg-gray-700/50 rounded-lg mb-4 border border-gray-600/30">
+                        <div class="flex items-center">
+                            <i class="fas fa-brain text-purple-400 text-xl mr-3"></i>
+                            <div>
+                                <h5 class="text-white font-medium">Smart Category Suggestions</h5>
+                                <p class="text-gray-400 text-sm">Auto-suggest categories based on description</p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="smart_suggestions" value="1" 
+                                   {% if user.settings and user.settings.smart_suggestions %}checked{% endif %}
+                                   class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                    
+                    <!-- Confirmation Dialogs Toggle -->
+                    <div class="flex items-center justify-between p-4 bg-gray-700/50 rounded-lg border border-gray-600/30">
+                        <div class="flex items-center">
+                            <i class="fas fa-shield-check text-green-400 text-xl mr-3"></i>
+                            <div>
+                                <h5 class="text-white font-medium">Confirmation Dialogs</h5>
+                                <p class="text-gray-400 text-sm">Show confirmation before deleting transactions</p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="show_confirmations" value="1" 
+                                   {% if user.settings and user.settings.show_confirmations %}checked{% endif %}
+                                   class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex gap-4">
+                    <button type="button" onclick="toggleAppSettings()" 
+                            class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg transition duration-300 font-medium">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-lg transition duration-300 font-medium">
+                        <i class="fas fa-save mr-2"></i>Save Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Financial Notes Modal -->
+<div id="financialNotesModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-gray-800 rounded-xl p-8 max-w-2xl w-full border border-gray-700 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center">
+                    <i class="fas fa-sticky-note text-purple-400 text-2xl mr-3"></i>
+                    <h3 class="text-2xl font-bold text-white">Financial Journal</h3>
+                </div>
+                <button onclick="toggleFinancialNotes()" class="text-gray-400 hover:text-white transition duration-300">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form action="{{ url_for('update_journal') }}" method="POST" class="mb-6">
+                <div class="bg-gray-700/30 rounded-xl p-6 border border-gray-600/50">
+                    <textarea name="journal_entry" class="w-full h-40 bg-gray-900 text-white rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Write your financial thoughts here..."></textarea>
+                </div>
+                
+                <div class="flex gap-4 mt-6">
+                    <button type="button" onclick="toggleFinancialNotes()" 
+                            class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg transition duration-300 font-medium">
+                        Close
+                    </button>
+                    <button type="submit" 
+                            class="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-3 rounded-lg transition duration-300 font-medium">
+                        <i class="fas fa-save mr-2"></i>Save Journal
+                    </button>
+                </div>
+            </form>
+
+            <hr class="border-gray-600 my-6">
+
+            <h4 class="text-xl font-semibold text-white mb-4">Past Entries</h4>
+            <div class="space-y-4">
+                {% for entry in user.journal_entries %}
+                <div class="bg-gray-700/50 rounded-lg p-4">
+                    <p class="text-gray-300">{{ entry.content }}</p>
+                    <p class="text-gray-500 text-sm mt-2">{{ entry.date | format_datetime }}</p>
+                </div>
+                {% else %}
+                <p class="text-gray-400">No journal entries yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Modal Functions
+function toggleEditProfile() {
+    alert('Demo mode - Profile editing not available');
+}
+
+function toggleChangePassword() {
+    alert('Demo mode - Password change not available');
+}
+
+function toggleFinancialNotes() {
+    document.getElementById('financialNotesModal').classList.toggle('hidden');
+}
+
+function toggleAppSettings() {
+    document.getElementById('appSettingsModal').classList.toggle('hidden');
+}
+
+function confirmDeleteAccount() {
+    alert('Demo mode - Account deletion not available');
+}
+
+// Close modals when clicking outside
+document.addEventListener('click', function(e) {
+    const modals = ['financialNotesModal', 'appSettingsModal'];
+    modals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (modal && e.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
+});
+
+// Close modals with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const modals = ['financialNotesModal', 'appSettingsModal'];
+        modals.forEach(modalId => {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

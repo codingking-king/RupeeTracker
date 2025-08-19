@@ -1,0 +1,615 @@
+{% extends "base.html" %}
+
+{% block title %}Budget Management{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-10">
+    <h1 class="text-4xl font-extrabold mb-8 text-text-light dark:text-text-dark text-center">💰 Smart Budget Management</h1>
+
+    <!-- Conditional Content based on current_budget -->
+    {% if current_budget > 0 %}
+        <!-- Warning/Alert Messages -->
+        {% if warning_message %}
+        <div class="mb-6 p-4 rounded-lg border shadow-md flex items-start w-full 
+            {% if warning_level == 'danger' %}bg-red-900/20 border-red-800 text-red-200{% elif warning_level == 'warning' %}bg-yellow-900/20 border-yellow-800 text-yellow-200{% else %}bg-blue-900/20 border-blue-800 text-blue-200{% endif %}" role="alert">
+            <i class="fas {% if warning_level == 'danger' %}fa-exclamation-triangle{% elif warning_level == 'warning' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %} mr-3 text-xl mt-0.5 
+                {% if warning_level == 'danger' %}text-red-400{% elif warning_level == 'warning' %}text-yellow-400{% else %}text-blue-400{% endif %}"></i>
+            <div>
+                <strong class="font-bold text-base">
+                    {% if warning_level == 'danger' %}Budget Exceeded!
+                    {% elif warning_level == 'warning' %}Budget Warning!
+                    {% else %}Information
+                    {% endif %}
+                </strong>
+                <p class="mt-1 text-sm">{{ warning_message }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Budget Lock Status -->
+        {% if budget_locked_reason %}
+        <div class="border p-4 rounded-lg mb-6 shadow-md flex items-start w-full 
+            {% if can_update_budget %}bg-orange-900/20 border-orange-800 text-orange-200{% else %}bg-red-900/20 border-red-800 text-red-200{% endif %}" role="alert">
+            <i class="fas {% if can_update_budget %}fa-clock text-orange-400{% else %}fa-lock text-red-400{% endif %} mr-3 text-xl"></i>
+            <div class="flex-1">
+                <span class="text-base font-semibold">
+                    {% if can_update_budget %}
+                        Monthly Budget Grace Period Active
+                    {% else %}
+                        Monthly Budget Locked
+                    {% endif %}
+                </span>
+                <p class="text-sm mt-1">{{ budget_locked_reason }}</p>
+                {% if not can_update_budget %}
+                <p class="text-sm mt-1 text-green-400">Category budgets can still be adjusted within the monthly limit.</p>
+                {% endif %}
+                {% if can_update_budget and grace_period_remaining > 0 %}
+                <div class="mt-3">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-orange-300">Grace Period Remaining</span>
+                        <span class="text-orange-300">{{ grace_period_remaining }} day(s)</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2">
+                        <div class="bg-orange-500 h-2 rounded-full transition-all duration-500" 
+                             style="width: {{ (grace_period_remaining / 2 * 100) }}%"></div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    {% endif %}
+
+    <!-- Monthly Budget Overview -->
+    <div class="grid grid-cols-1 {% if current_budget > 0 %}lg:grid-cols-2{% else %}lg:grid-cols-1{% endif %} gap-8 mb-10">
+        <!-- Set Monthly Budget -->
+            <div class="monthly-budget-card {% if current_budget > 0 %}bg-gray-800 border border-gray-700{% else %}bg-surface-light dark:bg-surface-dark{% endif %} rounded-xl p-8 shadow-xl {% if current_budget == 0 %}lg:col-span-full mx-auto max-w-md w-full{% endif %}">
+            <h2 class="text-2xl font-bold {% if current_budget > 0 %}text-white{% else %}text-text-light dark:text-text-dark{% endif %} mb-8 flex items-center">
+                <i class="fas fa-cog mr-4 text-green-400 text-2xl"></i>Set Monthly Budget
+            </h2>
+
+            <!-- Budget Strictness Warning -->
+            {% if current_budget == 0 %}
+            <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
+                <div class="flex items-center text-sm text-blue-400">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    <div>
+                        <p class="font-semibold mb-1">⚠️ Budget Strictness Policy</p>
+                        <p>Once set, your monthly budget will be locked for 24 hours to promote financial discipline. Category budgets can always be adjusted within the monthly limit.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <form method="POST" id="monthlyBudgetForm" class="space-y-6">
+                <input type="hidden" name="action" value="set_monthly_budget">
+                <div>
+                    <label for="monthly_budget" class="block text-sm font-medium {% if current_budget > 0 %}text-white{% else %}text-text-light dark:text-text-dark{% endif %} mb-2">
+                        <i class="fas fa-rupee-sign mr-2"></i>Total Monthly Budget
+                    </label>
+                    {% if current_budget > 0 and not can_update_budget %}
+                    <!-- Locked Budget Display -->
+                    <input type="text" 
+                           value="₹{{ current_budget|currencyformat }}"
+                           disabled readonly
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white opacity-60 cursor-not-allowed">
+                    <p class="text-xs text-gray-400 mt-1">
+                        <i class="fas fa-lock mr-1"></i>Monthly budget is locked until next month
+                    </p>
+                    {% else %}
+                    <!-- Editable Budget Input -->
+                    <input type="number" 
+                           name="monthly_budget" 
+                           id="monthly_budget" 
+                           step="0.01" 
+                           min="0"
+                           value="{{ current_budget if current_budget > 0 else '' }}"
+                           placeholder="Enter your monthly budget"
+                           class="w-full px-4 py-3 {% if current_budget > 0 %}bg-gray-700 border border-gray-600 text-white{% else %}bg-input-bg-light dark:bg-input-bg-dark border border-input-border-light dark:border-input-border-dark text-text-light dark:text-text-dark{% endif %} rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                           required>
+                    {% if current_budget > 0 %}
+                    <p class="text-xs text-gray-400 mt-1">
+                        <i class="fas fa-clock mr-1"></i>Grace period: {{ grace_period_remaining }} day(s) remaining
+                    </p>
+                    {% endif %}
+                    {% endif %}
+                </div>
+
+                {% if current_budget == 0 %}
+                <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                    <div class="flex items-center text-sm text-yellow-400">
+                        <i class="fas fa-lightbulb mr-2"></i>
+                        <span>Setting budget to ₹0 will disable budget tracking for this month.</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                    <div class="flex items-center text-sm text-green-400">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <span>This will be your total budget. You can then allocate portions to different categories.</span>
+                    </div>
+                </div>
+
+                {% if can_update_budget %}
+                <button type="submit" 
+                        class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-save mr-2"></i>
+                    {% if current_budget > 0 %}Update Monthly Budget{% else %}Set Monthly Budget{% endif %}
+                </button>
+                {% else %}
+                <div class="w-full bg-gray-600 text-gray-300 font-bold py-3 px-6 rounded-lg text-center cursor-not-allowed">
+                    <i class="fas fa-lock mr-2"></i>Monthly Budget Locked Until Next Month
+                </div>
+                {% endif %}
+
+                {% if last_updated %}
+                <p class="text-xs text-gray-400 text-center">
+                    Last updated: {{ last_updated }}
+                    {% if last_updated and days_since_update > 0 %}
+                    ({{ days_since_update }} day(s) ago)
+                    {% endif %}
+                </p>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- Monthly Budget Status -->
+        {% if current_budget > 0 %}
+            <div class="monthly-budget-card bg-gray-800 rounded-xl p-8 shadow-xl border border-gray-700">
+                <h2 class="text-2xl font-bold text-white mb-8 flex items-center">
+                    <i class="fas fa-calendar-alt mr-4 text-blue-400 text-2xl"></i>{{ current_month }} Overview
+                </h2>
+            
+            <!-- Budget Summary Cards -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-4 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100 text-sm">Monthly Budget</p>
+                            <p class="text-lg font-bold">₹{{ current_budget|currencyformat }}</p>
+                        </div>
+                        <i class="fas fa-wallet text-2xl opacity-70"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-red-500 to-red-600 rounded-lg p-4 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-red-100 text-sm">Total Spent</p>
+                            <p class="text-lg font-bold">₹{{ monthly_expenses|currencyformat }}</p>
+                        </div>
+                        <i class="fas fa-arrow-down text-2xl opacity-70"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-4 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-green-100 text-sm">Income</p>
+                            <p class="text-lg font-bold">₹{{ monthly_income|currencyformat }}</p>
+                        </div>
+                        <i class="fas fa-arrow-up text-2xl opacity-70"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r {% if remaining_budget >= 0 %}from-purple-500 to-purple-600{% else %}from-orange-500 to-orange-600{% endif %} rounded-lg p-4 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-100 text-sm">Remaining</p>
+                            <p class="text-lg font-bold">₹{{ remaining_budget|currencyformat }}</p>
+                        </div>
+                        <i class="fas fa-{% if remaining_budget >= 0 %}check-circle{% else %}times-circle{% endif %} text-2xl opacity-70"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Budget Progress Bar -->
+            <div class="mb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-gray-300">Budget Usage</span>
+                    <span class="text-sm text-gray-300">{{ "%.1f"|format(budget_usage_percentage) }}%</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-4">
+                    <div class="bg-gradient-to-r 
+                         {% if budget_usage_percentage >= 100 %}from-red-500 to-red-600
+                         {% elif budget_usage_percentage >= 90 %}from-yellow-500 to-yellow-600
+                         {% elif budget_usage_percentage >= 70 %}from-orange-500 to-orange-600
+                         {% else %}from-green-500 to-green-600{% endif %} 
+                         h-4 rounded-full transition-all duration-500" 
+                         style="width: {{ [budget_usage_percentage, 100]|min }}%"></div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Category Budgets Section -->
+    {% if current_budget > 0 %}
+    <div class="bg-gray-800 rounded-xl p-8 shadow-xl mb-10 border border-gray-700">
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-2xl font-bold text-white flex items-center">
+                <i class="fas fa-tags mr-4 text-purple-400 text-2xl"></i>Category Budgets
+                {% if not can_update_budget %}
+                <span class="text-sm text-green-400 ml-3">(Always adjustable within monthly limit)</span>
+                {% endif %}
+            </h2>
+            <button onclick="toggleCategoryBudgetModal()" class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-5 py-2.5 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg">
+                <i class="fas fa-plus mr-2"></i>Set Category Budget
+            </button>
+        </div>
+
+        <!-- Category Budget Cards -->
+        <div id="category-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for category in categories %}
+            {% set category_budget = category_budgets.get(category, 0) %}
+            {% set category_spent = category_expenses.get(category, 0) %}
+            {% set category_remaining = category_budget - category_spent %}
+            {% set category_usage = (category_spent / category_budget * 100) if category_budget > 0 else 0 %}
+            
+            <div class="category-card category-budget-card bg-gray-700/50 rounded-xl p-6 border border-gray-600/50 hover:border-purple-500/50 transition-all duration-300 shadow-md">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-white">{{ category }}</h3>
+                    <button onclick="editCategoryBudget('{{ category }}', {{ category_budget }})" class="text-purple-400 hover:text-purple-300 transition duration-300">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+                
+                {% if category_budget > 0 %}
+                <!-- Budget Set -->
+                <div class="space-y-3">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-400">Budget:</span>
+                        <span class="text-white font-medium">₹{{ category_budget|currencyformat }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-400">Spent:</span>
+                        <span class="text-red-400 font-medium">₹{{ category_spent|currencyformat }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-400">Remaining:</span>
+                        <span class="{% if category_remaining >= 0 %}text-green-400{% else %}text-red-400{% endif %} font-medium">₹{{ category_remaining|currencyformat }}</span>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-gray-600 rounded-full h-2">
+                        <div class="bg-gradient-to-r 
+                             {% if category_usage >= 100 %}from-red-500 to-red-600
+                             {% elif category_usage >= 80 %}from-yellow-500 to-yellow-600
+                             {% else %}from-green-500 to-green-600{% endif %} 
+                             h-2 rounded-full transition-all duration-500" 
+                             style="width: {{ [category_usage, 100]|min }}%"></div>
+                        </div>
+                    <div class="text-center text-xs text-gray-400">{{ "%.1f"|format(category_usage) }}% used</div>
+                </div>
+                {% else %}
+                <!-- No Budget Set -->
+                <div class="text-center py-4">
+                    <i class="fas fa-plus-circle text-gray-500 text-2xl mb-2"></i>
+                    <p class="text-gray-400 text-sm mb-3">No budget set</p>
+                    <button onclick="editCategoryBudget('{{ category }}', 0)" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded text-sm transition duration-300">
+                        Set Budget
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-8">
+            <button id="toggle-categories-btn" class="bg-gray-700 hover:bg-gray-600 text-white px-8 py-3.5 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg">
+                See All Categories
+            </button>
+        </div>
+
+        <!-- Budget Allocation Summary -->
+        <div class="mt-8 bg-gray-700/30 rounded-xl p-6 border border-gray-600/30 shadow-inner">
+            <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                <i class="fas fa-chart-pie mr-3 text-blue-400 text-xl"></i>Budget Allocation
+            </h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div class="text-center">
+                    <p class="text-gray-400">Total Budget</p>
+                    <p class="text-white font-bold">₹{{ current_budget|currencyformat }}</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-gray-400">Allocated</p>
+                    <p class="text-purple-400 font-bold">₹{{ total_allocated|currencyformat }}</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-gray-400">Unallocated</p>
+                    <p class="{% if (current_budget - total_allocated) >= 0 %}text-green-400{% else %}text-red-400{% endif %} font-bold">₹{{ (current_budget - total_allocated)|currencyformat }}</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-gray-400">Allocation %</p>
+                    <p class="text-blue-400 font-bold">{{ "%.1f"|format((total_allocated / current_budget * 100) if current_budget > 0 else 0) }}%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Budget History -->
+    {% if budget_history %}
+    <div class="bg-gray-800 rounded-xl p-8 shadow-xl border border-gray-700">
+        <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+            <i class="fas fa-history mr-4 text-orange-400 text-2xl"></i>Budget History
+        </h2>
+        
+        <div class="overflow-x-auto rounded-lg border border-gray-700">
+            <table class="min-w-full text-white">
+                <thead class="bg-gray-700">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Month</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Budget</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Expenses</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Remaining</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Usage</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-gray-800 divide-y divide-gray-700">
+                    {% for month_data in budget_history %}
+                    <tr class="hover:bg-gray-700 transition-colors duration-200">
+                        <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">{{ month_data.month }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm">₹{{ month_data.get('budget', 0)|currencyformat }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-red-400">₹{{ month_data.get('expenses', 0)|currencyformat }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm {% if month_data.get('remaining', 0) >= 0 %}text-green-400{% else %}text-red-400{% endif %}">
+                            ₹{{ month_data.get('remaining', 0)|currencyformat }}
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm">
+                            <div class="flex items-center">
+                                <div class="w-16 bg-gray-700 rounded-full h-2 mr-2">
+                                    <div class="h-2 rounded-full 
+                                         {% if month_data.get('usage_percentage', 0) >= 100 %}bg-red-500
+                                         {% elif month_data.get('usage_percentage', 0) >= 90 %}bg-yellow-500
+                                         {% else %}bg-green-500{% endif %}" 
+                                         style="width: {{ [month_data.get('usage_percentage', 0), 100]|min }}%"></div>
+                                </div>
+                                <span class="text-xs">{{ "%.0f"|format(month_data.get('usage_percentage', 0)) }}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Category Budget Modal -->
+<div id="categoryBudgetModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-gray-800 rounded-xl p-8 max-w-md w-full border border-gray-700 shadow-2xl">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center">
+                    <i class="fas fa-tags text-purple-400 text-2xl mr-3"></i>
+                    <h3 class="text-2xl font-bold text-white">Set Category Budget</h3>
+                </div>
+                <button onclick="toggleCategoryBudgetModal()" class="text-gray-400 hover:text-white transition duration-300">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            {% if not can_update_budget %}
+            <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mb-6">
+                <div class="flex items-center text-sm text-green-400">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    <span>Monthly budget is locked, but you can still adjust category budgets within the total limit.</span>
+                </div>
+            </div>
+            {% endif %}
+            
+            <form method="POST" id="categoryBudgetForm">
+                <input type="hidden" name="action" value="set_category_budget">
+                <input type="hidden" name="category" id="modalCategory">
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-white text-sm font-medium mb-2">
+                            <i class="fas fa-tag mr-2"></i>Category
+                        </label>
+                        <input type="text" id="modalCategoryDisplay" readonly
+                               class="w-full p-4 bg-gray-700 border border-gray-600 rounded-lg text-white opacity-60 cursor-not-allowed" />
+                    </div>
+                    <div>
+                        <label class="block text-white text-sm font-medium mb-2">
+                            <i class="fas fa-rupee-sign mr-2"></i>Budget Amount
+                        </label>
+                        <input type="number" name="budget_amount" id="budgetAmount" step="0.01" min="0" placeholder="0.00" 
+                               class="w-full p-4 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-300" required>
+                    </div>
+                    <div id="budgetValidation" class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 hidden">
+                        <div class="flex items-center text-sm text-yellow-400">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            <span id="validationMessage"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-8">
+                    <button type="button" onclick="toggleCategoryBudgetModal()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg transition duration-300 font-medium">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-3 rounded-lg transition duration-300 font-medium">
+                        <i class="fas fa-save mr-2"></i>Set Budget
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="budget-data"
+     data-current-budget='{{ (current_budget or 0)|tojson }}'
+     data-total-allocated='{{ (total_allocated or 0)|tojson }}'
+     data-category-budgets='{{ category_budgets|tojson|safe }}'
+     data-is-first-time="{{ 'true' if current_budget == 0 else 'false' }}"
+     style="display: none;">
+</div>
+
+<script>
+    // Modal Functions
+    function toggleCategoryBudgetModal() {
+        const modal = document.getElementById('categoryBudgetModal');
+        if (modal) {
+            modal.classList.toggle('hidden');
+            if (modal.classList.contains('hidden')) {
+                document.getElementById('categoryBudgetForm').reset();
+                document.getElementById('budgetValidation').classList.add('hidden');
+            }
+        }
+    }
+
+    function editCategoryBudget(category, currentBudget) {
+        const modal = document.getElementById('categoryBudgetModal');
+        if (modal) {
+            document.getElementById('modalCategoryDisplay').value = category;
+            document.getElementById('modalCategory').value = category;
+            document.getElementById('budgetAmount').value = currentBudget > 0 ? currentBudget.toFixed(2) : '';
+            toggleCategoryBudgetModal();
+        }
+    }
+
+    // updateModalCategory function is no longer needed as category is directly set
+
+    // Retrieve data from the data-attributes
+    const budgetDataElement = document.getElementById('budget-data');
+    const totalBudget = JSON.parse(budgetDataElement.dataset.currentBudget);
+    const totalAllocated = JSON.parse(budgetDataElement.dataset.totalAllocated);
+    const categoryBudgets = JSON.parse(budgetDataElement.dataset.categoryBudgets);
+    const isFirstTime = budgetDataElement.dataset.isFirstTime === 'true';
+
+    // Budget validation on input
+    const budgetAmountInput = document.getElementById('budgetAmount');
+    if (budgetAmountInput) {
+        budgetAmountInput.addEventListener('input', function() {
+            const amount = parseFloat(this.value) || 0;
+            const selectedCategory = document.getElementById('modalCategory').value;
+            const currentCategoryBudget = categoryBudgets[selectedCategory] || 0;
+            const newTotalAllocated = totalAllocated - currentCategoryBudget + amount;
+            
+            const validationDiv = document.getElementById('budgetValidation');
+            const messageSpan = document.getElementById('validationMessage');
+            
+            if (newTotalAllocated > totalBudget) {
+                validationDiv.classList.remove('hidden');
+                messageSpan.textContent = `This would exceed your monthly budget by ₹${(newTotalAllocated - totalBudget).toFixed(2)}`;
+                validationDiv.className = 'bg-red-500/10 border border-red-500/30 rounded-lg p-4';
+                messageSpan.className = 'text-red-400';
+            } else if (newTotalAllocated === totalBudget) {
+                validationDiv.classList.remove('hidden');
+                messageSpan.textContent = 'Perfect! This will fully allocate your monthly budget.';
+                validationDiv.className = 'bg-green-500/10 border border-green-500/30 rounded-lg p-4';
+                messageSpan.className = 'text-green-400';
+            } else {
+                validationDiv.classList.add('hidden');
+            }
+        });
+    }
+
+    // Form validation on submit
+    const categoryBudgetForm = document.getElementById('categoryBudgetForm');
+    if (categoryBudgetForm) {
+        categoryBudgetForm.addEventListener('submit', function(e) {
+            const amount = parseFloat(document.getElementById('budgetAmount').value) || 0;
+            const selectedCategory = document.getElementById('modalCategory').value;
+            const currentCategoryBudget = categoryBudgets[selectedCategory] || 0;
+            const newTotalAllocated = totalAllocated - currentCategoryBudget + amount;
+            
+            if (newTotalAllocated > totalBudget) {
+                e.preventDefault();
+                alert(`This budget allocation would exceed your monthly budget by ₹${(newTotalAllocated - totalBudget).toFixed(2)}. Please reduce the amount.`);
+                return false;
+            }
+        });
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('click', function(e) {
+        const modal = document.getElementById('categoryBudgetModal');
+        if (modal && e.target === modal) {
+            toggleCategoryBudgetModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('categoryBudgetModal');
+            if (modal && !modal.classList.contains('hidden')) {
+                toggleCategoryBudgetModal();
+            }
+        }
+    });
+
+    // Budget strictness confirmation
+    const budgetForm = document.getElementById('monthlyBudgetForm');
+    if (budgetForm) {
+        budgetForm.addEventListener('submit', function(e) {
+            const budgetInput = document.getElementById('monthly_budget');
+            if (budgetInput && !budgetInput.disabled) {
+                const budgetValue = parseFloat(budgetInput.value);
+                
+                if (isFirstTime && budgetValue > 0) {
+                    if (!confirm('⚠️ Budget Strictness: Once set, your monthly budget will be locked for 24 hours to promote financial discipline. Category budgets can always be adjusted within the monthly limit. Continue?')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+                
+                if (budgetValue === 0) {
+                    if (!confirm('Setting budget to ₹0 will disable budget tracking for this month. Are you sure?')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+            }
+        });
+    }
+
+    // Category "See All" functionality
+    const categoryCardsContainer = document.getElementById('category-cards-container');
+    const toggleCategoriesBtn = document.getElementById('toggle-categories-btn');
+    const categoryCards = categoryCardsContainer ? Array.from(categoryCardsContainer.querySelectorAll('.category-card')) : [];
+    const initialVisibleCount = 6; // Show first 6 categories
+
+    function initializeCategoryVisibility() {
+        if (categoryCards.length > initialVisibleCount) {
+            for (let i = initialVisibleCount; i < categoryCards.length; i++) {
+                categoryCards[i].classList.add('hidden');
+            }
+            toggleCategoriesBtn.textContent = 'See All Categories';
+            toggleCategoriesBtn.classList.remove('hidden');
+        } else {
+            toggleCategoriesBtn.classList.add('hidden');
+        }
+    }
+
+    function toggleCategoryVisibility() {
+        let allHidden = true;
+        for (let i = initialVisibleCount; i < categoryCards.length; i++) {
+            if (!categoryCards[i].classList.contains('hidden')) {
+                allHidden = false;
+                break;
+            }
+        }
+
+        if (allHidden) {
+            for (let i = initialVisibleCount; i < categoryCards.length; i++) {
+                categoryCards[i].classList.remove('hidden');
+            }
+            toggleCategoriesBtn.textContent = 'Show Less Categories';
+        } else {
+            for (let i = initialVisibleCount; i < categoryCards.length; i++) {
+                categoryCards[i].classList.add('hidden');
+            }
+            toggleCategoriesBtn.textContent = 'See All Categories';
+        }
+    }
+
+    if (toggleCategoriesBtn) {
+        toggleCategoriesBtn.addEventListener('click', toggleCategoryVisibility);
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', initializeCategoryVisibility);
+</script>
+{% endblock %}

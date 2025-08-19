@@ -1,0 +1,407 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6 text-center">Transactions Dashboard</h1>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white shadow-lg card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-green-100 text-sm font-medium">Total Income</p>
+                    <p class="text-2xl font-bold">₹{{ total_income | currencyformat }}</p>
+                </div>
+                <div class="bg-green-400 bg-opacity-30 rounded-full p-3">
+                    <i class="fas fa-arrow-up text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-gradient-to-r from-red-500 to-red-600 rounded-lg p-6 text-white shadow-lg card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-red-100 text-sm font-medium">Total Expenses</p>
+                    <p class="text-2xl font-bold">₹{{ total_expenses | currencyformat }}</p>
+                </div>
+                <div class="bg-red-400 bg-opacity-30 rounded-full p-3">
+                    <i class="fas fa-arrow-down text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white shadow-lg card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-blue-100 text-sm font-medium">Current Balance</p>
+                    <p class="text-2xl font-bold">₹{{ current_balance | currencyformat }}</p>
+                </div>
+                <div class="bg-blue-400 bg-opacity-30 rounded-full p-3">
+                    <i class="fas fa-wallet text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Savings Card -->
+        <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg p-6 text-white shadow-lg card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-yellow-100 text-sm font-medium">Total Savings</p>
+                    <p class="text-2xl font-bold">₹{{ total_savings | currencyformat }}</p>
+                </div>
+                <div class="bg-yellow-400 bg-opacity-30 rounded-full p-3">
+                    <i class="fas fa-piggy-bank text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Budget Alert -->
+    {% if user_budget > 0 and monthly_expenses > user_budget %}
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6" role="alert">
+        <strong class="font-bold">Budget Alert!</strong>
+        <span class="block sm:inline">You have exceeded your monthly budget of ₹{{ user_budget | currencyformat }}. Current monthly expenses: ₹{{ monthly_expenses | currencyformat }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Quick Actions -->
+    <div class="bg-surface-dark rounded-lg p-6 shadow-lg mb-6 border border-primary-500/50">
+        <h2 class="text-xl font-semibold text-text-dark mb-4">Quick Actions</h2>
+        <div class="flex flex-wrap gap-4">
+            <a href="{{ url_for('transactions_page') }}" class="bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded transition duration-300">
+                <i class="fas fa-plus mr-2"></i>Add Transaction
+            </a>
+            <a href="{{ url_for('transactions_page') }}" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded transition duration-300">
+                <i class="fas fa-list mr-2"></i>View All Transactions
+            </a>
+            <a href="{{ url_for('budgets_page') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded transition duration-300">
+                <i class="fas fa-chart-pie mr-2"></i>Manage Budget
+            </a>
+            <a href="{{ url_for('goals') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded transition duration-300">
+                <i class="fas fa-bullseye mr-2"></i>Savings Goals
+            </a>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+        <div class="bg-surface-dark rounded-lg p-3 shadow-lg border border-primary-500/50">
+            <h3 class="text-text-dark text-sm font-semibold mb-2 text-center">Category Expenses</h3>
+            <div class="h-48">
+                <canvas id="expensePieChart"></canvas>
+            </div>
+        </div>
+        <div class="bg-surface-dark rounded-lg p-3 shadow-lg border border-primary-500/50">
+            <h3 class="text-text-dark text-sm font-semibold mb-2 text-center">Income vs Expense</h3>
+            <div class="h-48">
+                <canvas id="incomeExpenseBarChart"></canvas>
+            </div>
+        </div>
+        <div class="bg-surface-dark rounded-lg p-3 shadow-lg border border-primary-500/50">
+            <h3 class="text-text-dark text-sm font-semibold mb-2 text-center">Monthly Overview</h3>
+            <div class="h-48 flex flex-col justify-center items-center text-center">
+                <div class="mb-3">
+                    <p class="text-gray-300 text-xs">This Month</p>
+                    <p class="text-lg font-bold text-white">₹{{ (monthly_income - monthly_expenses) | currencyformat }}</p>
+                    <p class="text-xs {% if monthly_income - monthly_expenses >= 0 %}text-green-400{% else %}text-red-400{% endif %}">
+                        {% if monthly_income - monthly_expenses >= 0 %}Surplus{% else %}Deficit{% endif %}
+                    </p>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2 mb-2">
+                    {% set budget_percentage = (monthly_expenses / user_budget * 100) if user_budget > 0 else 0 %}
+                    <div class="bg-{% if budget_percentage > 100 %}red{% elif budget_percentage > 80 %}yellow{% else %}green{% endif %}-500 h-2 rounded-full" 
+                         style="width: {{ [budget_percentage, 100]|min }}%"></div>
+                </div>
+                <p class="text-gray-400 text-xs">
+                    Budget: ₹{{ user_budget | currencyformat }} 
+                    ({{ "%.0f"|format(budget_percentage) }}% used)
+                </p>
+            </div>
+        </div>
+        <!-- Monthly Cash Flow Chart -->
+        <div class="bg-surface-dark rounded-lg p-3 shadow-lg border border-primary-500/50">
+            <h3 class="text-text-dark text-sm font-semibold mb-2 text-center">Monthly Cash Flow</h3>
+            <div class="h-48">
+                <canvas id="monthlyCashFlowChart"></canvas>
+            </div>
+        </div>
+        <!-- Savings Goals Progress -->
+        <div class="bg-surface-dark rounded-lg p-3 shadow-lg border border-primary-500/50">
+            <h3 class="text-text-dark text-sm font-semibold mb-2 text-center">Savings Goals Progress</h3>
+            <div class="h-48 flex flex-col items-center text-center overflow-y-auto">
+                {% if goals %}
+                    {% for goal in goals %}
+                        <div class="w-full mb-4 p-2 border border-gray-700 rounded-lg category-budget-card">
+                            <p class="text-gray-300 text-sm font-medium text-left">{{ goal.title }}</p>
+                            <p class="text-lg font-bold text-white text-left">
+                                ₹{{ goal['saved_amount'] | currencyformat }} / ₹{{ goal['target_amount'] | currencyformat }}
+                            </p>
+                            <p class="text-gray-400 text-xs text-left">
+                                Remaining: ₹{{ (goal['target_amount'] - goal['saved_amount']) | currencyformat }}
+                            </p>
+                            <div class="w-full bg-gray-700 rounded-full h-2 mt-1">
+                                {% set progress_percentage = (goal['saved_amount'] / goal['target_amount'] * 100) if goal['target_amount'] > 0 else 0 %}
+                                <div class="bg-purple-500 h-2 rounded-full" style="width: {{ [progress_percentage, 100]|min }}%"></div>
+                            </div>
+                            <p class="text-gray-400 text-xs mt-1">{{ "%.0f"|format(progress_percentage) }}% Achieved</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center mt-auto mb-auto">
+                        <p class="text-gray-400 text-sm">No savings goals set yet.</p>
+                        <a href="{{ url_for('create_goal') }}" class="text-blue-400 hover:underline text-sm">Create a new goal</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <!-- Budgets Section -->
+        <div class="bg-surface-dark rounded-lg p-3 shadow-lg border border-primary-500/50">
+            <h3 class="text-text-dark text-sm font-semibold mb-2 text-center">Budgets</h3>
+            <div class="h-48 flex flex-col items-center text-center overflow-y-auto custom-scrollbar">
+                <div class="w-full mb-4 p-2 border border-gray-700 rounded-lg monthly-budget-card">
+                    <p class="text-gray-300 text-sm font-medium text-left">Monthly Budget</p>
+                    <p class="text-lg font-bold text-white text-left">
+                        ₹{{ monthly_expenses | currencyformat }} / ₹{{ user_budget | currencyformat }}
+                    </p>
+                    <p class="text-gray-400 text-xs text-left">
+                        Remaining: ₹{{ (user_budget - monthly_expenses) | currencyformat }}
+                    </p>
+                    <div class="w-full bg-gray-700 rounded-full h-2 mt-1">
+                        {% set monthly_budget_percentage = (monthly_expenses / user_budget * 100) if user_budget > 0 else 0 %}
+                        <div class="bg-purple-500 h-2 rounded-full" style="width: {{ [monthly_budget_percentage, 100]|min }}%"></div>
+                    </div>
+                    <p class="text-gray-400 text-xs mt-1">{{ "%.0f"|format(monthly_budget_percentage) }}% Used</p>
+                </div>
+                {% if category_budgets %}
+                    {% for category, budget_amount in category_budgets.items() %}
+                        {% set spent_amount = current_month_category_expenses.get(category, 0) %}
+                        <div class="w-full mb-4 p-2 border border-gray-700 rounded-lg category-budget-card">
+                            <p class="text-gray-300 text-sm font-medium text-left">{{ category }} Budget</p>
+                            <p class="text-lg font-bold text-white text-left">
+                                ₹{{ spent_amount | currencyformat }} / ₹{{ budget_amount | currencyformat }}
+                            </p>
+                            <p class="text-gray-400 text-xs text-left">
+                                Remaining: ₹{{ (budget_amount - spent_amount) | currencyformat }}
+                            </p>
+                            <div class="w-full bg-gray-700 rounded-full h-2 mt-1">
+                                {% set category_budget_percentage = (spent_amount / budget_amount * 100) if budget_amount > 0 else 0 %}
+                                <div class="bg-orange-500 h-2 rounded-full" style="width: {{ [category_budget_percentage, 100]|min }}%"></div>
+                            </div>
+                            <p class="text-gray-400 text-xs mt-1">{{ "%.0f"|format(category_budget_percentage) }}% Used</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center mt-auto mb-auto">
+                        <p class="text-gray-400 text-sm">No category budgets set yet.</p>
+                        <a href="{{ url_for('budgets_page') }}" class="text-blue-400 hover:underline text-sm">Manage Budgets</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx1 = document.getElementById('expensePieChart');
+    const ctx2 = document.getElementById('incomeExpenseBarChart');
+    const ctx3 = document.getElementById('monthlyCashFlowChart');
+
+    // Get the computed style of the body to determine current text color
+    const computedStyle = getComputedStyle(document.body);
+    const textColor = computedStyle.getPropertyValue('color');
+
+    // Parse the expense categories data from backend
+    const expenseCategoriesData = {{ expense_categories_json | safe }};
+    
+    if (ctx1 && expenseCategoriesData.labels.length > 0) {
+        new Chart(ctx1, {
+            type: 'doughnut',
+            data: {
+                labels: expenseCategoriesData.labels,
+                datasets: [{
+                    data: expenseCategoriesData.data,
+                    backgroundColor: ['#a78bfa', '#60a5fa', '#34d399', '#facc15', '#f87171', '#f472b6', '#8b5cf6', '#10b981'], // Using primary, accent, and other vibrant Tailwind colors
+                    borderWidth: 1,
+                    borderColor: 'var(--surface-dark)' // Use surface-dark for border color to blend with chart background
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                backgroundColor: 'transparent', // Ensure chart background is transparent
+                plugins: { 
+                    legend: { 
+                        position: 'bottom',
+                        labels: { 
+                            color: textColor, // Use dynamic text color
+                            font: { size: 10 },
+                            padding: 8,
+                            usePointStyle: true
+                        }
+                    }
+                },
+                cutout: '60%'
+            }
+        });
+    } else if (ctx1) {
+        // Show message when no expense data
+        ctx1.getContext('2d').fillStyle = textColor; // Use dynamic text color
+        ctx1.getContext('2d').font = '12px Arial';
+        ctx1.getContext('2d').textAlign = 'center';
+        ctx1.getContext('2d').fillText('No expense data', ctx1.width/2, ctx1.height/2);
+    }
+
+    // Parse the income vs expenses data from backend
+    const incomeVsExpensesData = {{ income_vs_expenses_json | safe }};
+    
+    if (ctx2) {
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: incomeVsExpensesData.labels,
+                datasets: [{
+                    label: 'Amount (₹)',
+                    data: [{{ monthly_income }}, {{ monthly_expenses }}],
+                    backgroundColor: ['#10b981', '#ef4444'], // Accent-500 and Red-500
+                    borderColor: ['#059669', '#dc2626'], // Accent-600 and Red-600
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                backgroundColor: 'transparent', // Ensure chart background is transparent
+                plugins: { 
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { 
+                        ticks: { 
+                            color: textColor, // Use dynamic text color
+                            font: { size: 10 }
+                        },
+                        grid: { color: 'var(--border-dark)' } // Use CSS variable for grid color
+                    },
+                    y: { 
+                        ticks: { 
+                            color: textColor, // Use dynamic text color
+                            font: { size: 10 },
+                            callback: function(value) {
+                                return '₹' + (value/1000).toFixed(0) + 'k';
+                            }
+                        },
+                        beginAtZero: true,
+                        grid: { color: 'var(--border-dark)' } // Use CSS variable for grid color
+                    }
+                }
+            }
+        });
+    }
+
+    // Monthly Cash Flow Chart
+    const monthlyCashFlowData = {{ monthly_cash_flow_json | safe }};
+    if (ctx3 && monthlyCashFlowData.labels.length > 0) {
+        new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: monthlyCashFlowData.labels,
+                datasets: [{
+                    label: 'Monthly Cash Flow (₹)',
+                    data: monthlyCashFlowData.data,
+                    backgroundColor: monthlyCashFlowData.data.map(function(v) { return v >= 0 ? 'rgba(16, 185, 129, 0.6)' : 'rgba(239, 68, 68, 0.6)'; }),
+                    borderColor: monthlyCashFlowData.data.map(function(v) { return v >= 0 ? '#059669' : '#dc2626'; }),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                backgroundColor: 'transparent',
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: textColor,
+                            font: { size: 10 }
+                        },
+                        grid: { color: 'var(--border-dark)' }
+                    },
+                    y: {
+                        ticks: {
+                            color: textColor,
+                            font: { size: 10 },
+                            callback: function(value) {
+                                return '₹' + (value/1000).toFixed(0) + 'k';
+                            }
+                        },
+                        beginAtZero: true,
+                        grid: { color: 'var(--border-dark)' }
+                    }
+                }
+            }
+        });
+    } else if (ctx3) {
+        ctx3.getContext('2d').fillStyle = textColor;
+        ctx3.getContext('2d').font = '12px Arial';
+        ctx3.getContext('2d').textAlign = 'center';
+        ctx3.getContext('2d').fillText('No cash flow data', ctx3.width/2, ctx3.height/2);
+    }
+
+</script>
+    <!-- Recent Transactions Section -->
+    <div class="rounded-lg shadow-lg border border-primary-500/50 bg-gray-800">
+        <h2 class="text-xl font-semibold text-white mb-4 p-6">Recent Transactions</h2>
+        {% if recent_transactions %}
+        <div class="overflow-x-auto max-h-[400px] overflow-y-auto">
+            <table class="min-w-full bg-gray-800 text-sm text-gray-300">
+                <thead class="text-gray-400 uppercase sticky top-0 z-10" style="background-color: #1a202c;">
+                    <tr>
+                        <th class="py-3 px-4 text-left bg-gray-900">Date</th>
+                        <th class="py-3 px-4 text-left bg-gray-900">Description</th>
+                        <th class="py-3 px-4 text-left bg-gray-900">Category</th>
+                        <th class="py-3 px-4 text-center bg-gray-900">Type</th>
+                        <th class="py-3 px-4 text-right bg-gray-900">Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="recentTransactionsTableBody">
+                    {% for transaction in recent_transactions %}
+                    <tr class="border-b border-primary-500/50 hover:bg-gray-700/30 transition-colors duration-200">
+                        <td class="py-3 px-4 whitespace-nowrap">
+                            {{ transaction.timestamp_dt.strftime('%b %d, %Y %I:%M %p') if transaction.timestamp_dt else transaction.timestamp }}
+                        </td>
+                        <td class="py-3 px-4">{{ transaction.description }}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-1 rounded-full text-xs bg-gray-700">{{ transaction.category }}</span>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold capitalize
+                                {% if transaction.type == 'income' %}bg-green-500/20 text-green-300 border border-green-500/30
+                                {% else %}bg-red-500/20 text-red-300 border border-red-500/30{% endif %}">
+                                {{ transaction.type }}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-right font-mono {% if transaction.type == 'income' %}text-green-400{% else %}text-red-400{% endif %}">
+                            ₹{{ transaction.amount | currencyformat }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-16 bg-gray-800/50 rounded-lg border border-dashed border-gray-700">
+            <div class="text-6xl mb-4 text-gray-600">📝</div>
+            <p class="text-gray-400 text-lg mb-6">No recent transactions to display.</p>
+            <a href="{{ url_for('transactions_page') }}" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-4 rounded-xl font-semibold transition duration-300 transform hover:scale-105 shadow-lg text-lg">
+                <i class="fas fa-plus mr-2"></i>Add Your First Transaction
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

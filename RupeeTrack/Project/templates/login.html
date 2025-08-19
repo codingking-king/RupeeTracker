@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+
+{% block hide_sidebar %}{% endblock %}
+
+{% block content %}
+<div class="flex items-center flex-col pt-16 pb-8">
+    <div class="w-full max-w-md mx-auto space-y-6 bg-surface-dark p-8 rounded-lg shadow-lg">
+        <div>
+            <h2 class="mt-4 text-center text-3xl font-extrabold text-text-dark">
+                <i class="fas fa-wallet text-primary-400 mr-2"></i> Welcome Back
+            </h2>
+            <p class="mt-1 text-center text-sm text-gray-400">
+                Sign in to your account to continue
+            </p>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="notification-container">
+                    <div class="flex flex-col items-center space-y-3">
+                        {% for category, message in messages %}
+                            <div id="notification-{{ loop.index }}" class="notification-alert p-3 text-base rounded-lg shadow-lg border-l-4 {% if category == 'error' %}bg-red-900/90 text-red-100 border-red-500{% else %}bg-green-900/90 text-green-100 border-green-500{% endif %} backdrop-blur-sm transition-all duration-300 ease-in-out transform" role="alert">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        {% if category == 'error' %}
+                                            <i class="fas fa-exclamation-triangle text-red-400 text-lg mr-2"></i>
+                                        {% else %}
+                                            <i class="fas fa-check-circle text-green-400 text-lg mr-2"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mr-3">
+                                        <p class="font-medium">{{ message }}</p>
+                                    </div>
+                                    <div class="flex-shrink-0">
+                                        <button onclick="closeNotification('notification-{{ loop.index }}')" class="inline-flex text-gray-300 hover:text-white focus:outline-none focus:text-white transition-colors duration-200 hover:bg-gray-700 rounded-full p-1">
+                                            <i class="fas fa-times text-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Login Form -->
+        <form id="loginForm" class="mt-6 space-y-4" method="POST">
+            <div class="rounded-md shadow-sm space-y-4">
+                <div>
+                    <label for="email-address" class="sr-only">Email address</label>
+                    <input id="email-address" name="email" type="email" autocomplete="email" required
+                           class="appearance-none relative block w-full px-3 py-2 border-none placeholder-gray-400 text-text-dark rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm bg-dark-700 mb-4"
+                           placeholder="Email address">
+                </div>
+                <div>
+                    <label for="password" class="sr-only">Password</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required
+                           class="appearance-none relative block w-full px-3 py-2 border-none placeholder-gray-400 text-text-dark rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm bg-dark-700"
+                           placeholder="Password">
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-300 ease-in-out">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <i class="fas fa-sign-in-alt text-primary-200 group-hover:text-primary-100"></i>
+                    </span>
+                    Sign In
+                </button>
+            </div>
+        </form>
+
+
+        <div class="text-center text-sm mt-4">
+            <p class="text-gray-400">Don't have an account? 
+                <a href="{{ url_for('signup') }}" class="font-medium text-primary-400 hover:text-primary-300">
+                    Sign up here
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTOJjcAQgiOHAgLQvGAJsrpyI5h9UwafM",
+            authDomain: "rupeetrack-1bae2.firebaseapp.com",
+            projectId: "rupeetrack-1bae2",
+            storageBucket: "rupeetrack-1bae2.firebasestorage.app",
+            messagingSenderId: "1066229359905",
+            appId: "1:1066229359905:web:872ca5c4ffd70c59f80a60",
+            measurementId: "G-1S76X9QVRW"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Email/Password Sign In
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email-address').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                const idToken = await user.getIdToken();
+                
+                await sendTokenToServer(idToken);
+            } catch (error) {
+                console.error('Login error:', error);
+                if (error.code === 'auth/wrong-password') {
+                    showAlert('Invalid password. Please try again.', 'error');
+                } else if (error.code === 'auth/user-not-found') {
+                    showAlert('No account found with this email. Please sign up or check your email.', 'error');
+                } else if (error.code === 'auth/invalid-email') {
+                    showAlert('Invalid email address format.', 'error');
+                } else {
+                    showAlert('Login failed: ' + error.message, 'error');
+                }
+            }
+        });
+
+        // Send ID token to server for verification
+        async function sendTokenToServer(idToken) {
+            try {
+                const response = await fetch('/verify_token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ idToken: idToken })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    window.location.href = '/';
+                } else {
+                    showAlert('Authentication failed: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Token verification error:', error);
+                showAlert('Authentication failed. Please try again.', 'error');
+            }
+        }
+
+        // Show alert function (now uses base.html's notification system)
+        function showAlert(message, type) {
+            const notificationContainer = document.querySelector('.notification-container');
+            if (!notificationContainer) {
+                console.error('Notification container not found.');
+                return;
+            }
+
+            const alertDiv = document.createElement('div');
+            alertDiv.id = `notification-${Date.now()}`; // Unique ID
+            alertDiv.className = `notification-alert p-3 text-base rounded-lg shadow-lg border-l-4 ${type === 'error' ? 'bg-red-900/90 text-red-100 border-red-500' : 'bg-green-900/90 text-green-100 border-green-500'} backdrop-blur-sm transition-all duration-300 ease-in-out transform`;
+            alertDiv.setAttribute('role', 'alert');
+
+            alertDiv.innerHTML = `
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        ${type === 'error' ? '<i class="fas fa-exclamation-triangle text-red-400 text-lg mr-2"></i>' : '<i class="fas fa-check-circle text-green-400 text-lg mr-2"></i>'}
+                    </div>
+                    <div class="mr-3">
+                        <p class="font-medium">${message}</p>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <button onclick="closeNotification('${alertDiv.id}')" class="inline-flex text-gray-300 hover:text-white focus:outline-none focus:text-white transition-colors duration-200 hover:bg-gray-700 rounded-full p-1">
+                            <i class="fas fa-times text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Append to the flex container inside notification-container
+            const flexContainer = notificationContainer.querySelector('.flex.flex-col.items-center.space-y-3');
+            if (flexContainer) {
+                flexContainer.appendChild(alertDiv);
+            } else {
+                notificationContainer.appendChild(alertDiv); // Fallback if inner flex container not found
+            }
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                closeNotification(alertDiv.id);
+            }, 5000);
+        }
+
+        // Auto-hide notifications after 5 seconds (copied from base.html for consistency if needed client-side)
+        document.addEventListener('DOMContentLoaded', function() {
+            const notifications = document.querySelectorAll('.notification-alert');
+            notifications.forEach(function(notification, index) {
+                setTimeout(() => {
+                    if (notification && notification.parentNode) {
+                        closeNotification(notification.id);
+                    }
+                }, 5000 + (index * 500));
+            });
+        });
+
+        // Close notification function (copied from base.html for consistency if needed client-side)
+        function closeNotification(notificationId) {
+            const notification = document.getElementById(notificationId);
+            if (notification) {
+                notification.classList.add('notification-exit');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }
+        }
+    </script>
+{% endblock %}

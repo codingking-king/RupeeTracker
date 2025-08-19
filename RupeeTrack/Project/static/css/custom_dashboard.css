@@ -1,0 +1,23 @@
+.monthly-budget-card {
+    border: 2px solid #a78bfa; /* Purple border for monthly budget */
+    background-color: rgba(167, 139, 250, 0.15); /* Slightly darker light purple background */
+    box-shadow: 0 4px 12px rgba(167, 139, 250, 0.2); /* Purple shadow */
+    transition: all 0.3s ease-in-out;
+}
+
+.monthly-budget-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(167, 139, 250, 0.3);
+}
+
+.category-budget-card {
+    border: 2px solid var(--border-dark); /* Neutral border */
+    background-color: transparent; /* Inherit parent background, matching savings goals */
+    box-shadow: none; /* Remove specific shadow */
+    transition: all 0.3s ease-in-out;
+}
+
+.category-budget-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3); /* Neutral shadow on hover */
+}
