@@ -29,7 +29,7 @@
     </div>
 
     <!-- Financial Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
             <div class="flex items-center justify-between">
                 <div>
@@ -69,19 +69,6 @@
             </div>
         </div>
 
-        <!-- New Savings Card -->
-        <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-lg p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-yellow-100 text-sm font-medium">Total Savings</p>
-                    <p class="text-2xl font-bold break-words">₹{{ "{:,.2f}".format(total_savings) }}</p>
-                    <p class="text-yellow-100 text-xs mt-1">from {{ savings_count }} sources</p>
-                </div>
-                <div class="bg-yellow-400 bg-opacity-30 rounded-full p-4">
-                    <i class="fas fa-piggy-bank text-2xl"></i>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Financial Highlights -->
@@ -201,11 +188,6 @@
     </div>
 </div>
 
-<div class="flex justify-center mt-8">
-    <button onclick="window.location.href='/logout'" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg text-xl font-semibold">
-        <i class="fas fa-sign-out-alt mr-3"></i>Logout
-    </button>
-</div>
 
 <!-- App Settings Modal -->
 <div id="appSettingsModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 hidden">

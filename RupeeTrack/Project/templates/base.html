@@ -1,9 +1,9 @@
-<!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}RupeeTrack{% endblock %}</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -56,8 +56,7 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/loading_screen.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom_dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         :root {
             --bg-dark: #030712; /* dark-950 */
@@ -162,26 +161,11 @@
             background-color: var(--bg-dark);
             color: var(--text-dark);
             min-height: 100vh; /* Ensure body covers full viewport height */
-            background: linear-gradient(135deg, var(--primary-950), var(--primary-900), var(--primary-800));
-            background-size: 400% 400%;
-            animation: gradientAnimation 15s ease infinite;
             border: none !important;
             outline: none !important;
             overflow-x: hidden; /* Hide horizontal scrollbar */
         }
 
-        @keyframes gradientAnimation {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-        
         .container {
             max-width: 1280px;
             margin: 0 auto;
@@ -395,6 +379,23 @@
                 display: block;
             }
         }
+
+        /* General responsive adjustments for main content */
+        @media (max-width: 768px) {
+            main {
+                padding: 1rem !important; /* Reduce padding on smaller screens */
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 0 0.5rem; /* Even smaller padding for very small screens */
+            }
+            /* Adjust font sizes for better readability on small screens if needed */
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+            p, a, li { font-size: 0.9rem; }
+        }
     </style>
 </head>
 <body>
@@ -414,13 +415,18 @@
         <aside id="sidebar" class="sidebar w-64 flex-shrink-0 bg-dark-950 text-text-dark border-r border-dark-800 p-6 overflow-y-auto md:sticky md:top-0 flex flex-col justify-between">
             <div>
                 <div class="flex items-center justify-between mb-8">
-                    <a id="rupeetrack-logo" class="text-text-dark text-2xl font-extrabold tracking-wide" href="{{ url_for('index') }}">RupeeTrack</a>
+                            <a id="rupeetrack-logo" class="text-text-dark text-2xl font-extrabold tracking-wide" href="{{ url_for('index') }}">RupeeTrack</a>
                 </div>
                 <nav class="space-y-3">
                     <ul>
                         <li>
                             <a href="{{ url_for('index') }}" class="sidebar-link flex items-center py-3 px-4 rounded-lg text-lg font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition duration-200 ease-in-out {% if request.endpoint == 'index' %}active{% endif %}">
-                                <i class="fas fa-home mr-3"></i>Dashboard
+                                <i class="fas fa-home mr-3"></i>Home
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('dashboard') }}" class="sidebar-link flex items-center py-3 px-4 rounded-lg text-lg font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition duration-200 ease-in-out {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                                <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
                             </a>
                         </li>
                         <li>
@@ -431,11 +437,6 @@
                         <li>
                             <a href="{{ url_for('budgets_page') }}" class="sidebar-link flex items-center py-3 px-4 rounded-lg text-lg font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition duration-200 ease-in-out {% if request.endpoint == 'budgets_page' %}active{% endif %}">
                                 <i class="fas fa-money-check-alt mr-3"></i>Budgets
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ url_for('goals') }}" class="sidebar-link flex items-center py-3 px-4 rounded-lg text-lg font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition duration-200 ease-in-out {% if request.endpoint == 'goals' %}active{% endif %}">
-                                <i class="fas fa-bullseye mr-3"></i>Savings Goals
                             </a>
                         </li>
                     </ul>
@@ -460,8 +461,16 @@
 
         <!-- Main Content Area -->
         <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header for mobile sidebar toggle -->
+            <header class="md:hidden flex items-center justify-between p-4 bg-dark-950 text-text-dark border-b border-dark-800">
+                <button id="sidebar-toggle-btn" class="text-text-dark focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                <a class="text-text-dark text-xl font-extrabold tracking-wide" href="{{ url_for('index') }}">RupeeTrack</a>
+                <div></div> <!-- Placeholder for right alignment if needed -->
+            </header>
             <!-- Page Content -->
-            <main class="flex-1 overflow-y-auto p-8 pt-4" style="background-color: var(--surface-dark) !important; min-height: 100vh;">
+            <main class="flex-1 overflow-y-auto {% block main_content_classes %}{% endblock %}" style="min-height: 100vh;">
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         <div class="notification-container">
@@ -500,7 +509,6 @@
 
     <div id="content-overlay" class="content-overlay md:hidden" onclick="toggleSidebar()"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Enhanced notification close function
         function closeNotification(notificationId) {
@@ -513,7 +521,6 @@
             }
         }
 
-        // Auto-hide notifications after 5 seconds
         document.addEventListener('DOMContentLoaded', function() {
             const notifications = document.querySelectorAll('.notification-alert');
             notifications.forEach(function(notification, index) {
@@ -547,21 +554,7 @@
         }
     </script>
     {% block scripts %}{% endblock %}
-    <script src="{{ url_for('static', filename='js/loading_screen.js') }}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const rupeetrackLogo = document.getElementById('rupeetrack-logo');
-            if (rupeetrackLogo) {
-                rupeetrackLogo.addEventListener('click', function(event) {
-                    event.preventDefault(); // Prevent default link behavior
-                    window.showLoadingScreen(); // Call the global function from loading_screen.js
-                    // Redirect after a short delay to allow loading screen to show
-                    setTimeout(() => {
-                        window.location.href = rupeetrackLogo.href;
-                    }, 500); // Adjust delay as needed
-                });
-            }
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>

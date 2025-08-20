@@ -19,14 +19,6 @@
             "timestamp": "2025-08-15 22:23:00"
         },
         {
-            "id": "9364a228-32a5-48a4-8d77-47779164c674",
-            "description": "Freelance",
-            "amount": 5000.0,
-            "type": "income",
-            "category": "Salary",
-            "timestamp": "2025-08-10 22:42:16"
-        },
-        {
             "id": "c109616d-de95-40ec-a29f-7f271ad8e65f",
             "description": "Monthly Salary",
             "amount": 25000.0,
@@ -57,14 +49,6 @@
             "type": "expense",
             "category": "Housing",
             "timestamp": "2025-08-01 22:53:31"
-        },
-        {
-            "id": "94b6c6c5-abca-4806-9b26-b191f20a62e1",
-            "description": "Chai Biscuit",
-            "amount": 20.0,
-            "type": "expense",
-            "category": "Food",
-            "timestamp": "2025-08-13 23:07:16"
         },
         {
             "id": "7476b51f-eb90-473b-a745-53911b8b8e71",
@@ -169,13 +153,62 @@
             "type": "income",
             "category": "Salary",
             "timestamp": "2025-08-15 23:24:35"
+        },
+        {
+            "id": "8332dd39-8564-4929-b738-c40fabded25e",
+            "description": "Part-time",
+            "amount": 1500.0,
+            "type": "income",
+            "category": "Salary",
+            "timestamp": "2025-08-19 22:56:16"
+        },
+        {
+            "id": "45d11938-0f86-4a14-b65c-45edf350d7a9",
+            "description": "Bonus",
+            "amount": 3000.0,
+            "type": "income",
+            "category": "Salary",
+            "timestamp": "2025-08-20 11:58:13"
+        },
+        {
+            "id": "51e71ece-7bd1-4bc1-9bbf-e2f0a8f22183",
+            "description": "Monthly Salary",
+            "amount": 25000.0,
+            "type": "income",
+            "category": "Salary",
+            "timestamp": "2025-08-20 12:26:51"
+        },
+        {
+            "id": "2dd71e36-3c71-4a67-9257-f2bfcf703318",
+            "description": "Part-time",
+            "amount": 1500.0,
+            "type": "income",
+            "category": "Salary",
+            "timestamp": "2025-08-20 14:14:09"
+        },
+        {
+            "id": "c5f7e3fb-3fb9-4da0-9403-4758da382c5b",
+            "description": "Bonus",
+            "amount": 3000.0,
+            "type": "income",
+            "category": "Salary",
+            "timestamp": "2025-08-09 14:38:10"
+        },
+        {
+            "id": "943c8361-72d4-427f-b4a0-7df650731276",
+            "description": "Part-time",
+            "amount": 1500.0,
+            "type": "income",
+            "category": "Salary",
+            "timestamp": "2025-08-04 14:38:18"
         }
     ],
     "budget": {
         "monthly": 25000.0,
         "categories": {
             "Entertainment": 5000.0,
-            "Food": 4000.0
+            "Food": 4000.0,
+            "Transport": 1500.0
         },
         "history": [
             {
@@ -207,10 +240,11 @@
             }
         ]
     },
-    "goals": [],
     "settings": {
         "show_presets": true,
-        "smart_suggestions": false,
+        "smart_suggestions": true,
         "show_confirmations": false
-    }
+    },
+    "journal_entries": [],
+    "goals": []
 }

@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6 text-white text-center">📊 Your Transactions</h1>
+<div class="container mx-auto px-4 py-8 md:px-8 md:py-12">
+    <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-white text-center">📊 Your Transactions</h1>
 
     <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
         <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white shadow-lg">
             <div class="flex items-center justify-between">
                 <div>
@@ -44,31 +44,31 @@
     </div>
 
     <!-- Controls: Add Transaction, Filter, Search -->
-    <div class="bg-gray-800 rounded-xl p-4 mb-8 flex flex-col md:flex-row items-center justify-between gap-4 shadow-lg border border-gray-700/50">
-        <button onclick="toggleAddTransactionModal()" class="w-full md:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-3 rounded-lg font-semibold transition duration-300 transform hover:scale-105 shadow-lg text-center">
+    <div class="bg-gray-800 rounded-xl p-4 md:p-6 mb-6 md:mb-8 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4 shadow-lg border border-gray-700/50">
+        <button onclick="toggleAddTransactionModal()" class="w-full md:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-3 md:px-8 md:py-4 rounded-lg font-semibold transition duration-300 transform hover:scale-105 shadow-lg text-base md:text-lg text-center">
             <i class="fas fa-plus mr-2"></i>Add Transaction
         </button>
-        <div class="w-full md:w-auto flex flex-col md:flex-row gap-4">
-            <div class="relative">
+        <div class="w-full md:w-auto flex flex-col sm:flex-row flex-wrap justify-center md:justify-end gap-3 md:gap-4">
+            <div class="relative w-full sm:w-auto">
                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <input type="text" id="searchInput" placeholder="Search descriptions..." maxlength="30" class="w-full md:w-64 bg-gray-700 border border-gray-600 rounded-lg py-3 pl-12 pr-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="text" id="searchInput" placeholder="Search descriptions..." maxlength="30" class="w-full sm:w-64 bg-gray-700 border border-gray-600 rounded-lg py-2 pl-12 pr-4 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
-            <div class="relative">
+            <div class="relative w-full sm:w-auto">
                 <i class="fas fa-filter absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <select id="categoryFilter" class="w-full md:w-48 appearance-none bg-gray-700 border border-gray-600 rounded-lg py-3 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <select id="categoryFilter" class="w-full sm:w-48 appearance-none bg-gray-700 border border-gray-600 rounded-lg py-2 pl-12 pr-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">All Categories</option>
                     {% for category in categories %}
                     <option value="{{ category }}">{{ category }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="relative">
+            <div class="relative w-full sm:w-auto">
                 <i class="fas fa-calendar-alt absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <input type="date" id="startDate" class="w-full md:w-48 bg-gray-700 border border-gray-600 rounded-lg py-3 pl-12 pr-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" title="Start Date">
+                <input type="date" id="startDate" class="w-full sm:w-48 bg-gray-700 border border-gray-600 rounded-lg py-2 pl-12 pr-4 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" title="Start Date">
             </div>
-            <div class="relative">
+            <div class="relative w-full sm:w-auto">
                 <i class="fas fa-calendar-alt absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <input type="date" id="endDate" class="w-full md:w-48 bg-gray-700 border border-gray-600 rounded-lg py-3 pl-12 pr-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" title="End Date">
+                <input type="date" id="endDate" class="w-full sm:w-48 bg-gray-700 border border-gray-600 rounded-lg py-2 pl-12 pr-4 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500" title="End Date">
             </div>
         </div>
     </div>
@@ -80,35 +80,35 @@
             <table class="min-w-full bg-gray-800 text-sm text-gray-300">
                 <thead class="text-gray-400 uppercase sticky top-0 z-10" style="background-color: #1a202c;">
                     <tr>
-                        <th class="py-3 px-4 text-left bg-gray-900">Date</th>
-                        <th class="py-3 px-4 text-left bg-gray-900">Description</th>
-                        <th class="py-3 px-4 text-left bg-gray-900">Category</th>
-                        <th class="py-3 px-4 text-right bg-gray-900">Amount</th>
-                        <th class="py-3 px-4 text-center bg-gray-900">Type</th>
-                        <th class="py-3 px-4 text-center bg-gray-900">Actions</th>
+                        <th class="py-2 px-3 md:py-3 md:px-4 text-left bg-gray-900">Date</th>
+                        <th class="py-2 px-3 md:py-3 md:px-4 text-left bg-gray-900">Description</th>
+                        <th class="py-2 px-3 md:py-3 md:px-4 text-left bg-gray-900">Category</th>
+                        <th class="py-2 px-3 md:py-3 md:px-4 text-right bg-gray-900">Amount</th>
+                        <th class="py-2 px-3 md:py-3 md:px-4 text-center bg-gray-900">Type</th>
+                        <th class="py-2 px-3 md:py-3 md:px-4 text-center bg-gray-900">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="transactionsTableBody">
                     {% for transaction in transactions %}
                     <tr class="border-b border-primary-500/50 hover:bg-gray-700/30 transition-colors duration-200">
-                        <td class="py-3 px-4 whitespace-nowrap">
+                        <td class="py-2 px-3 md:py-3 md:px-4 whitespace-nowrap text-xs md:text-sm">
                             {{ transaction.timestamp_dt.strftime('%b %d, %Y %I:%M %p') if transaction.timestamp_dt else transaction.timestamp }}
                         </td>
-                        <td class="py-3 px-4">{{ transaction.description }}</td>
-                        <td class="py-3 px-4">
+                        <td class="py-2 px-3 md:py-3 md:px-4 text-xs md:text-sm">{{ transaction.description }}</td>
+                        <td class="py-2 px-3 md:py-3 md:px-4">
                             <span class="px-2 py-1 rounded-full text-xs bg-gray-700">{{ transaction.category }}</span>
                         </td>
-                        <td class="py-3 px-4 text-right font-mono {% if transaction.type == 'income' %}text-green-400{% else %}text-red-400{% endif %}">
+                        <td class="py-2 px-3 md:py-3 md:px-4 text-right font-mono text-xs md:text-sm {% if transaction.type == 'income' %}text-green-400{% else %}text-red-400{% endif %}">
                             ₹{{ transaction.amount | currencyformat }}
                         </td>
-                        <td class="py-3 px-4 text-center">
+                        <td class="py-2 px-3 md:py-3 md:px-4 text-center">
                             <span class="px-3 py-1 rounded-full text-xs font-semibold capitalize 
                                 {% if transaction.type == 'income' %}bg-green-500/20 text-green-300 border border-green-500/30
                                 {% else %}bg-red-500/20 text-red-300 border border-red-500/30{% endif %}">
                                 {{ transaction.type }}
                             </span>
                         </td>
-                        <td class="py-3 px-4 text-center">
+                        <td class="py-2 px-3 md:py-3 md:px-4 text-center">
                             <a href="{{ url_for('delete_transaction', tx_id=transaction.id) }}" class="text-red-400 hover:text-red-300" onclick="return confirm('Are you sure you want to delete this transaction?');"><i class="fas fa-trash"></i></a>
                         </td>
                     </tr>
@@ -118,10 +118,10 @@
         </div>
     </div>
     {% else %}
-    <div class="text-center py-16 bg-gray-800/50 rounded-lg border border-dashed border-gray-700">
-        <div class="text-6xl mb-4 text-gray-600">📝</div>
-        <p class="text-gray-400 text-lg mb-6">You haven't recorded any transactions yet.</p>
-        <button onclick="toggleAddTransactionModal()" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-4 rounded-xl font-semibold transition duration-300 transform hover:scale-105 shadow-lg text-lg">
+    <div class="text-center py-8 md:py-16 bg-gray-800/50 rounded-lg border border-dashed border-gray-700">
+        <div class="text-5xl md:text-6xl mb-3 md:mb-4 text-gray-600">📝</div>
+        <p class="text-gray-400 text-base md:text-lg mb-4 md:mb-6">You haven't recorded any transactions yet.</p>
+        <button onclick="toggleAddTransactionModal()" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold transition duration-300 transform hover:scale-105 shadow-lg text-base md:text-lg">
             <i class="fas fa-plus mr-2"></i>Add Your First Transaction
         </button>
     </div>
@@ -131,32 +131,32 @@
 <!-- Add Transaction Modal -->
 <div id="addTransactionModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 hidden">
     <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-gray-800 rounded-xl p-8 max-w-6xl w-full border border-gray-700 shadow-2xl grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="bg-gray-800 rounded-xl p-4 md:p-8 max-w-6xl w-full border border-gray-700 shadow-2xl grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
             <!-- Left Column: Add/Edit Transaction Form -->
             <div>
-                <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center justify-between mb-4 md:mb-6">
                     <div class="flex items-center">
-                        <i id="modalIcon" class="fas fa-plus-circle text-green-400 text-2xl mr-3"></i>
-                        <h3 id="modalTitle" class="text-2xl font-bold text-white">Add New Transaction</h3>
+                        <i id="modalIcon" class="fas fa-plus-circle text-green-400 text-xl md:text-2xl mr-2 md:mr-3"></i>
+                        <h3 id="modalTitle" class="text-xl md:text-2xl font-bold text-white">Add New Transaction</h3>
                     </div>
                     <button onclick="closeModal()" class="text-gray-400 hover:text-white transition duration-300">
-                        <i class="fas fa-times text-xl"></i>
+                        <i class="fas fa-times text-lg md:text-xl"></i>
                     </button>
                 </div>
                 
                 <form id="transactionForm" method="POST">
                     <input type="hidden" name="tx_id" id="modalTxId">
-                    <div class="space-y-6">
+                    <div class="space-y-4 md:space-y-6">
                         <!-- Transaction Type Buttons -->
                         <div>
-                            <label class="block text-sm font-medium text-white mb-2">
+                            <label class="block text-sm font-medium text-white mb-1 md:mb-2">
                                 <i class="fas fa-exchange-alt mr-2 text-blue-400"></i>Type
                             </label>
-                            <div class="flex space-x-4">
-                                <button type="button" id="incomeBtn" class="flex-1 py-3 px-4 rounded-lg text-white font-semibold transition duration-300 focus:outline-none bg-gray-700 hover:bg-gray-600" data-type="income">
+                            <div class="flex space-x-3 md:space-x-4">
+                                <button type="button" id="incomeBtn" class="flex-1 py-2 px-3 md:py-3 md:px-4 rounded-lg text-white font-semibold transition duration-300 focus:outline-none bg-gray-700 hover:bg-gray-600 text-sm md:text-base" data-type="income">
                                     <i class="fas fa-arrow-up mr-2"></i>Income
                                 </button>
-                                <button type="button" id="expenseBtn" class="flex-1 py-3 px-4 rounded-lg text-white font-semibold transition duration-300 focus:outline-none bg-gray-700 hover:bg-gray-600" data-type="expense">
+                                <button type="button" id="expenseBtn" class="flex-1 py-2 px-3 md:py-3 md:px-4 rounded-lg text-white font-semibold transition duration-300 focus:outline-none bg-gray-700 hover:bg-gray-600 text-sm md:text-base" data-type="expense">
                                     <i class="fas fa-arrow-down mr-2"></i>Expense
                                 </button>
                                 <input type="hidden" name="type" id="modalType" required>
@@ -165,7 +165,7 @@
 
                         <!-- Amount -->
                         <div>
-                            <label for="modalAmount" class="block text-sm font-medium text-white mb-2">
+                            <label for="modalAmount" class="block text-sm font-medium text-white mb-1 md:mb-2">
                                 <i class="fas fa-rupee-sign mr-2 text-green-400"></i>Amount
                             </label>
                             <input type="number" 
@@ -175,18 +175,18 @@
                                    min="0.01"
                                    required 
                                    placeholder="0.00"
-                                   class="w-full px-3 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-300">
+                                   class="w-full px-3 py-2 md:py-3 bg-gray-900 border border-gray-700 rounded-lg text-sm md:text-base text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-300">
                         </div>
 
                         <!-- Category -->
                         <div>
-                            <label for="modalCategory" class="block text-sm font-medium text-white mb-2">
+                            <label for="modalCategory" class="block text-sm font-medium text-white mb-1 md:mb-2">
                                 <i class="fas fa-tags mr-2 text-purple-400"></i>Category
                             </label>
                             <select name="category" 
                                     id="modalCategory" 
                                     required 
-                                    class="w-full px-3 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-300">
+                                    class="w-full px-3 py-2 md:py-3 bg-gray-900 border border-gray-700 rounded-lg text-sm md:text-base text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-300">
                                 <option value="">Select Category</option>
                                 {% for category in categories %}
                                 <option value="{{ category }}">{{ category }}</option>
@@ -196,19 +196,19 @@
 
                         <!-- Transaction Date -->
                         <div>
-                            <label for="modalTransactionDate" class="block text-sm font-medium text-white mb-2">
+                            <label for="modalTransactionDate" class="block text-sm font-medium text-white mb-1 md:mb-2">
                                 <i class="fas fa-calendar-alt mr-2 text-orange-400"></i>Date
                             </label>
                             <input type="date" 
                                    name="transaction_date" 
                                    id="modalTransactionDate" 
                                    required 
-                                   class="w-full px-3 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-300">
+                                   class="w-full px-3 py-2 md:py-3 bg-gray-900 border border-gray-700 rounded-lg text-sm md:text-base text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-300">
                         </div>
 
                         <!-- Description -->
                         <div>
-                            <label for="modalDescription" class="block text-sm font-medium text-white mb-2">
+                            <label for="modalDescription" class="block text-sm font-medium text-white mb-1 md:mb-2">
                                 <i class="fas fa-file-alt mr-2 text-yellow-400"></i>Description
                             </label>
                             <input type="text" 
@@ -217,14 +217,14 @@
                                    required 
                                    maxlength="30"
                                    placeholder="Enter transaction description"
-                                   class="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-300">
+                                   class="w-full px-4 py-2 md:py-3 bg-gray-900 border border-gray-700 rounded-lg text-sm md:text-base text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-300">
                         </div>
                     </div>
-                    <div class="flex gap-4 mt-8">
-                        <button type="button" onclick="closeModal()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg transition duration-300 font-medium">
+                    <div class="flex gap-3 md:gap-4 mt-6 md:mt-8">
+                        <button type="button" onclick="closeModal()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 md:py-3 rounded-lg transition duration-300 font-medium text-sm md:text-base">
                             Cancel
                         </button>
-                        <button type="submit" id="modalSubmitBtn" class="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 rounded-lg transition duration-300 font-medium">
+                        <button type="submit" id="modalSubmitBtn" class="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-2 md:py-3 rounded-lg transition duration-300 font-medium text-sm md:text-base">
                             <i id="modalSubmitIcon" class="fas fa-plus mr-2"></i><span id="modalSubmitText">Add Transaction</span>
                         </button>
                     </div>
@@ -232,29 +232,29 @@
             </div>
 
             <!-- Right Column: Quick Add Presets or Settings Message -->
-            <div class="bg-gray-900 rounded-xl p-6 border border-gray-700/50">
+            <div class="bg-gray-900 rounded-xl p-4 md:p-6 border border-gray-700/50">
                 {% if user.settings and user.settings.show_presets %}
-                <h2 class="text-xl font-semibold text-white mb-4">
+                <h2 class="text-lg md:text-xl font-semibold text-white mb-3 md:mb-4">
                     <i class="fas fa-bolt mr-2 text-yellow-400"></i>Quick Add Presets
                 </h2>
-                <p class="text-gray-400 text-sm mb-4">Click any preset to fill the form, then click "Add Transaction"</p>
+                <p class="text-gray-400 text-xs md:text-sm mb-3 md:mb-4">Click any preset to fill the form, then click "Add Transaction"</p>
                 
                 <!-- Income Presets Section -->
-                <div class="mb-6">
-                    <h3 class="text-sm font-semibold text-green-400 mb-3 flex items-center">
+                <div class="mb-4 md:mb-6">
+                    <h3 class="text-xs md:text-sm font-semibold text-green-400 mb-2 md:mb-3 flex items-center">
                         <i class="fas fa-arrow-up mr-2"></i>Income Presets
                     </h3>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button type="button" onclick="fillPresetTransaction('income', 25000, 'Salary', 'Monthly Salary')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                    <div class="grid grid-cols-2 gap-2 md:gap-3">
+                        <button type="button" onclick="fillPresetTransaction('income', 25000, 'Salary', 'Monthly Salary')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                             <i class="fas fa-money-bill-wave mr-2"></i>Salary<br><span class="text-xs text-gray-300">₹25000</span>
                         </button>
-                        <button type="button" onclick="fillPresetTransaction('income', 5000, 'Salary', 'Freelance Work')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                        <button type="button" onclick="fillPresetTransaction('income', 5000, 'Salary', 'Freelance Work')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                             <i class="fas fa-briefcase mr-2"></i>Freelance<br><span class="text-xs text-gray-300">₹5000</span>
                         </button>
-                        <button type="button" onclick="fillPresetTransaction('income', 3000, 'Salary', 'Bonus')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                        <button type="button" onclick="fillPresetTransaction('income', 3000, 'Salary', 'Bonus')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                             <i class="fas fa-gift mr-2"></i>Bonus<br><span class="text-xs text-gray-300">₹3000</span>
                         </button>
-                        <button type="button" onclick="fillPresetTransaction('income', 1500, 'Salary', 'Part-time')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                        <button type="button" onclick="fillPresetTransaction('income', 1500, 'Salary', 'Part-time')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                             <i class="fas fa-clock mr-2"></i>Part-time<br><span class="text-xs text-gray-300">₹1500</span>
                         </button>
                     </div>
@@ -262,78 +262,78 @@
 
                 <!-- Expense Presets Section -->
                 <div>
-                    <h3 class="text-sm font-semibold text-red-400 mb-3 flex items-center">
+                    <h3 class="text-xs md:text-sm font-semibold text-red-400 mb-2 md:mb-3 flex items-center">
                         <i class="fas fa-arrow-down mr-2"></i>Expense Presets
                     </h3>
                     <div class="max-h-64 overflow-y-auto pr-2">
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-2 gap-2 md:gap-3">
                             <!-- Food -->
-                            <button type="button" onclick="fillPresetTransaction('expense', 500, 'Food', 'Lunch')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 500, 'Food', 'Lunch')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-utensils mr-2"></i>Lunch<br><span class="text-xs text-gray-300">₹500</span>
                             </button>
-                            <button type="button" onclick="fillPresetTransaction('expense', 1500, 'Food', 'Groceries')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 1500, 'Food', 'Groceries')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-shopping-basket mr-2"></i>Groceries<br><span class="text-xs text-gray-300">₹1500</span>
                             </button>
-                            <button type="button" onclick="fillPresetTransaction('expense', 800, 'Food', 'Dinner')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 800, 'Food', 'Dinner')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-pizza-slice mr-2"></i>Dinner<br><span class="text-xs text-gray-300">₹800</span>
                             </button>
-                            <button type="button" onclick="fillPresetTransaction('expense', 300, 'Food', 'Breakfast')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 300, 'Food', 'Breakfast')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-bread-slice mr-2"></i>Breakfast<br><span class="text-xs text-gray-300">₹300</span>
                             </button>
 
                             <!-- Transport -->
-                            <button type="button" onclick="fillPresetTransaction('expense', 1000, 'Transport', 'Commute')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 1000, 'Transport', 'Commute')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-bus mr-2"></i>Commute<br><span class="text-xs text-gray-300">₹1000</span>
                             </button>
-                            <button type="button" onclick="fillPresetTransaction('expense', 2500, 'Transport', 'Fuel')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 2500, 'Transport', 'Fuel')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-gas-pump mr-2"></i>Fuel<br><span class="text-xs text-gray-300">₹2500</span>
                             </button>
-                            <button type="button" onclick="fillPresetTransaction('expense', 500, 'Transport', 'Taxi')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 500, 'Transport', 'Taxi')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-taxi mr-2"></i>Taxi<br><span class="text-xs text-gray-300">₹500</span>
                             </button>
-                            <button type="button" onclick="fillPresetTransaction('expense', 150, 'Transport', 'Auto')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 150, 'Transport', 'Auto')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-motorcycle mr-2"></i>Auto<br><span class="text-xs text-gray-300">₹150</span>
                             </button>
 
                             <!-- Bills -->
-                            <button type="button" onclick="fillPresetTransaction('expense', 2000, 'Bills', 'Electricity')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 2000, 'Bills', 'Electricity')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-bolt mr-2"></i>Electricity<br><span class="text-xs text-gray-300">₹2000</span>
                             </button>
-                            <button type="button" onclick="fillPresetTransaction('expense', 800, 'Bills', 'Mobile')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 800, 'Bills', 'Mobile')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-mobile-alt mr-2"></i>Mobile<br><span class="text-xs text-gray-300">₹800</span>
                             </button>
-                            <button type="button" onclick="fillPresetTransaction('expense', 1200, 'Bills', 'Internet')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 1200, 'Bills', 'Internet')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-wifi mr-2"></i>Internet<br><span class="text-xs text-gray-300">₹1200</span>
                             </button>
-                            <button type="button" onclick="fillPresetTransaction('expense', 1500, 'Bills', 'Water')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 1500, 'Bills', 'Water')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-tint mr-2"></i>Water<br><span class="text-xs text-gray-300">₹1500</span>
                             </button>
 
                             <!-- Entertainment -->
-                            <button type="button" onclick="fillPresetTransaction('expense', 200, 'Entertainment', 'Coffee')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 200, 'Entertainment', 'Coffee')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-coffee mr-2"></i>Coffee<br><span class="text-xs text-gray-300">₹200</span>
                             </button>
-                            <button type="button" onclick="fillPresetTransaction('expense', 500, 'Entertainment', 'Movie')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 500, 'Entertainment', 'Movie')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-film mr-2"></i>Movie<br><span class="text-xs text-gray-300">₹500</span>
                             </button>
-                            <button type="button" onclick="fillPresetTransaction('expense', 1000, 'Entertainment', 'Gaming')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 1000, 'Entertainment', 'Gaming')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-gamepad mr-2"></i>Gaming<br><span class="text-xs text-gray-300">₹1000</span>
                             </button>
-                            <button type="button" onclick="fillPresetTransaction('expense', 800, 'Entertainment', 'Party')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 800, 'Entertainment', 'Party')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-glass-cheers mr-2"></i>Party<br><span class="text-xs text-gray-300">₹800</span>
                             </button>
 
                             <!-- Housing -->
-                            <button type="button" onclick="fillPresetTransaction('expense', 15000, 'Housing', 'Rent')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 15000, 'Housing', 'Rent')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-home mr-2"></i>Rent<br><span class="text-xs text-gray-300">₹15000</span>
                             </button>
-                            <button type="button" onclick="fillPresetTransaction('expense', 3000, 'Housing', 'Maintenance')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 3000, 'Housing', 'Maintenance')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-tools mr-2"></i>Maintenance<br><span class="text-xs text-gray-300">₹3000</span>
                             </button>
-                            <button type="button" onclick="fillPresetTransaction('expense', 5000, 'Housing', 'Furniture')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 5000, 'Housing', 'Furniture')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-couch mr-2"></i>Furniture<br><span class="text-xs text-gray-300">₹5000</span>
                             </button>
-                            <button type="button" onclick="fillPresetTransaction('expense', 2000, 'Housing', 'Supplies')" class="bg-gray-700 hover:bg-gray-600 text-white py-3 px-3 rounded-lg font-medium transition duration-300 text-sm">
+                            <button type="button" onclick="fillPresetTransaction('expense', 2000, 'Housing', 'Supplies')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 md:py-3 md:px-3 rounded-lg font-medium transition duration-300 text-xs md:text-sm">
                                 <i class="fas fa-broom mr-2"></i>Supplies<br><span class="text-xs text-gray-300">₹2000</span>
                             </button>
                         </div>
@@ -341,18 +341,18 @@
                 </div>
                 {% else %}
                 <!-- Settings Message when presets are disabled -->
-                <div class="text-center py-8">
-                    <div class="text-6xl mb-4 text-gray-600">⚙️</div>
-                    <h3 class="text-xl font-semibold text-white mb-4">Quick Presets Disabled</h3>
-                    <p class="text-gray-400 mb-6">
+                <div class="text-center py-6 md:py-8">
+                    <div class="text-5xl md:text-6xl mb-3 md:mb-4 text-gray-600">⚙️</div>
+                    <h3 class="text-lg md:text-xl font-semibold text-white mb-3 md:mb-4">Quick Presets Disabled</h3>
+                    <p class="text-gray-400 text-sm md:text-base mb-4 md:mb-6">
                         Quick preset buttons are currently disabled. Enable them in your profile settings to quickly add common transactions.
                     </p>
-                    <div class="space-y-3">
-                        <button onclick="window.location.href='/profile'" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg">
+                    <div class="space-y-2 md:space-y-3">
+                        <button onclick="window.location.href='/profile'" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2 px-3 md:py-3 md:px-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg text-sm md:text-base">
                             <i class="fas fa-cog mr-2"></i>Go to Settings
                         </button>
-                        <div class="bg-gray-800/50 rounded-lg p-4 border border-gray-700/30">
-                            <div class="flex items-start text-sm text-gray-400">
+                        <div class="bg-gray-800/50 rounded-lg p-3 md:p-4 border border-gray-700/30">
+                            <div class="flex items-start text-xs md:text-sm text-gray-400">
                                 <i class="fas fa-info-circle mr-2 text-blue-400 mt-0.5"></i>
                                 <div>
                                     <p class="font-medium text-gray-300 mb-1">How to enable presets:</p>
@@ -372,11 +372,11 @@
 
 <script>
     window.appData = {
-        showPresets: {{ 'true' if user.settings and user.settings.show_presets else 'false' }},
-        smartSuggestions: {{ 'true' if user.settings and user.settings.smart_suggestions else 'false' }},
+        showPresets: JSON.parse("{{ 'true' if user.settings and user.settings.show_presets else 'false' }}"),
+        smartSuggestions: JSON.parse("{{ 'true' if user.settings and user.settings.smart_suggestions else 'false' }}"),
         addTransactionUrl: "{{ url_for('add_transaction') }}",
         editTransactionBaseUrl: "{{ url_for('edit_transaction', tx_id='TEMP_ID') }}"
     };
 </script>
-<script src="{{ url_for('static', filename='js/transactions.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 {% endblock %}
